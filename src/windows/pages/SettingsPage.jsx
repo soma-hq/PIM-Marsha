@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { updateMe, revokeAllMySessions, updatePrefs } from "../utils/api/client.jsx";
+import {
+	updateMe,
+	revokeAllMySessions,
+	updatePrefs,
+} from "../utils/api/client.jsx";
 
 /**
  * Renders One Session Row
@@ -78,7 +82,9 @@ export function SettingsPage({
 
 	// Security state
 	const [sessions, setSessions] = useState(sessionsPayload?.sessions || []);
-	const [currentSession, setCurrentSession] = useState(sessionsPayload?.currentSession || null);
+	const [currentSession, setCurrentSession] = useState(
+		sessionsPayload?.currentSession || null,
+	);
 	const [securityStatus, setSecurityStatus] = useState("");
 
 	// Preferences state
@@ -123,7 +129,9 @@ export function SettingsPage({
 			onUserUpdated(response.user);
 			setProfileStatus("Profil mis à jour.");
 		} catch (error) {
-			setProfileStatus(error.message || "Impossible de mettre à jour le profil.");
+			setProfileStatus(
+				error.message || "Impossible de mettre à jour le profil.",
+			);
 		} finally {
 			setBusy(false);
 		}
@@ -142,7 +150,10 @@ export function SettingsPage({
 		}
 		const reader = new FileReader();
 		reader.onload = () => {
-			setForm((prev) => ({ ...prev, avatarUrl: String(reader.result || "") }));
+			setForm((prev) => ({
+				...prev,
+				avatarUrl: String(reader.result || ""),
+			}));
 		};
 		reader.onerror = () => {
 			setProfileStatus("Impossible de lire l'image.");
@@ -160,7 +171,9 @@ export function SettingsPage({
 			setSecurityStatus("Toutes les sessions ont été coupées.");
 			onSecurityChanged?.();
 		} catch (error) {
-			setSecurityStatus(error.message || "Impossible de couper les sessions.");
+			setSecurityStatus(
+				error.message || "Impossible de couper les sessions.",
+			);
 		} finally {
 			setBusy(false);
 		}
@@ -202,13 +215,13 @@ export function SettingsPage({
 					</div>
 
 					{/* Tab Navigation */}
-					<div className="flex border-b border-white/10">
+					<div className="flex overflow-x-auto border-b border-white/10">
 						{TABS.map((tab) => (
 							<button
 								key={tab.id}
 								type="button"
 								onClick={() => setActiveTab(tab.id)}
-								className={`px-5 py-3 text-sm font-medium transition-colors ${
+								className={`shrink-0 whitespace-nowrap px-5 py-3 text-sm font-medium transition-colors ${
 									activeTab === tab.id
 										? "border-b-2 border-white/70 text-white"
 										: "text-white/40 hover:text-white/70"
@@ -220,8 +233,16 @@ export function SettingsPage({
 
 					{/* Profile Tab */}
 					{activeTab === "profile" && (
-						<form onSubmit={saveProfile} className="space-y-5 px-5 py-6">
-							<input ref={avatarInputRef} type="file" accept="image/png,image/jpeg" className="hidden" onChange={handleAvatarFileChange} />
+						<form
+							onSubmit={saveProfile}
+							className="space-y-5 px-5 py-6">
+							<input
+								ref={avatarInputRef}
+								type="file"
+								accept="image/png,image/jpeg"
+								className="hidden"
+								onChange={handleAvatarFileChange}
+							/>
 
 							{form.avatarUrl && (
 								<div className="flex justify-center">
@@ -235,21 +256,35 @@ export function SettingsPage({
 
 							<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 								<div>
-									<label className="mb-1.5 block text-xs text-white/50">Prénom</label>
+									<label className="mb-1.5 block text-xs text-white/50">
+										Prénom
+									</label>
 									<input
 										type="text"
 										value={form.firstName}
-										onChange={(e) => setForm((prev) => ({ ...prev, firstName: e.target.value }))}
+										onChange={(e) =>
+											setForm((prev) => ({
+												...prev,
+												firstName: e.target.value,
+											}))
+										}
 										className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/25 focus:border-white/20 focus:outline-none"
 										placeholder="Prénom"
 									/>
 								</div>
 								<div>
-									<label className="mb-1.5 block text-xs text-white/50">Nom</label>
+									<label className="mb-1.5 block text-xs text-white/50">
+										Nom
+									</label>
 									<input
 										type="text"
 										value={form.lastName}
-										onChange={(e) => setForm((prev) => ({ ...prev, lastName: e.target.value }))}
+										onChange={(e) =>
+											setForm((prev) => ({
+												...prev,
+												lastName: e.target.value,
+											}))
+										}
 										className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/25 focus:border-white/20 focus:outline-none"
 										placeholder="Nom"
 									/>
@@ -257,29 +292,45 @@ export function SettingsPage({
 							</div>
 
 							<div>
-								<label className="mb-1.5 block text-xs text-white/50">Nom affiché</label>
+								<label className="mb-1.5 block text-xs text-white/50">
+									Nom affiché
+								</label>
 								<input
 									type="text"
 									value={form.name}
-									onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+									onChange={(e) =>
+										setForm((prev) => ({
+											...prev,
+											name: e.target.value,
+										}))
+									}
 									className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/25 focus:border-white/20 focus:outline-none"
 									placeholder="Nom affiché"
 								/>
 							</div>
 
 							<div>
-								<label className="mb-1.5 block text-xs text-white/50">URL Avatar</label>
+								<label className="mb-1.5 block text-xs text-white/50">
+									URL Avatar
+								</label>
 								<div className="flex gap-2">
 									<input
 										type="text"
 										value={form.avatarUrl}
-										onChange={(e) => setForm((prev) => ({ ...prev, avatarUrl: e.target.value }))}
+										onChange={(e) =>
+											setForm((prev) => ({
+												...prev,
+												avatarUrl: e.target.value,
+											}))
+										}
 										className="flex-1 rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/25 focus:border-white/20 focus:outline-none"
 										placeholder="https://..."
 									/>
 									<button
 										type="button"
-										onClick={() => avatarInputRef.current?.click()}
+										onClick={() =>
+											avatarInputRef.current?.click()
+										}
 										className="rounded-md border border-white/15 bg-white/5 px-4 py-2 text-sm text-white/60 hover:bg-white/10">
 										Choisir
 									</button>
@@ -287,7 +338,9 @@ export function SettingsPage({
 							</div>
 
 							{profileStatus && (
-								<p className="text-xs text-white/50">{profileStatus}</p>
+								<p className="text-xs text-white/50">
+									{profileStatus}
+								</p>
 							)}
 
 							<button
@@ -303,23 +356,30 @@ export function SettingsPage({
 					{activeTab === "security" && (
 						<div className="space-y-5 px-5 py-6">
 							<div className="rounded-md border border-white/10 bg-white/[0.02] px-4 py-4">
-								<p className="mb-1 text-sm font-semibold text-white">Session courante</p>
+								<p className="mb-1 text-sm font-semibold text-white">
+									Session courante
+								</p>
 								{currentSession ? (
 									<>
 										<p className="text-xs text-white/50">
 											{currentSession.actorEmail || "—"}
 										</p>
 										<p className="mt-1 text-xs text-white/35">
-											{currentSession.metadata?.userAgent || "Agent inconnu"}
+											{currentSession.metadata
+												?.userAgent || "Agent inconnu"}
 										</p>
 									</>
 								) : (
-									<p className="text-xs text-white/35">Aucune session courante.</p>
+									<p className="text-xs text-white/35">
+										Aucune session courante.
+									</p>
 								)}
 							</div>
 
 							{securityStatus && (
-								<p className="text-xs text-white/50">{securityStatus}</p>
+								<p className="text-xs text-white/50">
+									{securityStatus}
+								</p>
 							)}
 
 							<button
@@ -340,7 +400,8 @@ export function SettingsPage({
 									Durée des notifications
 								</label>
 								<p className="mb-3 text-xs text-white/40">
-									Durée d'affichage des toasts (en millisecondes). Valeur par défaut : 4000 ms.
+									Durée d'affichage des toasts (en
+									millisecondes). Valeur par défaut : 4000 ms.
 								</p>
 								<div className="flex items-center gap-4">
 									<input
@@ -349,7 +410,14 @@ export function SettingsPage({
 										max={10000}
 										step={500}
 										value={prefForm.toastDurationMs}
-										onChange={(e) => setPrefForm((prev) => ({ ...prev, toastDurationMs: Number(e.target.value) }))}
+										onChange={(e) =>
+											setPrefForm((prev) => ({
+												...prev,
+												toastDurationMs: Number(
+													e.target.value,
+												),
+											}))
+										}
 										className="flex-1 accent-white/70"
 									/>
 									<span className="w-20 text-right text-sm text-white/60">
@@ -363,21 +431,34 @@ export function SettingsPage({
 									Taille des logos
 								</label>
 								<p className="mb-3 text-xs text-white/40">
-									Ajustez la taille des logos par organisation (multiplicateur).
+									Ajustez la taille des logos par organisation
+									(multiplicateur).
 								</p>
 								<div className="space-y-4">
 									{LOGO_KEYS.map(({ key, label }) => {
-										const scale = prefForm.logoScales[key] ?? 1;
+										const scale =
+											prefForm.logoScales[key] ?? 1;
 										return (
-											<div key={key} className="flex items-center gap-4 rounded-md border border-white/10 bg-white/[0.02] px-4 py-3">
-												<span className="w-24 text-sm text-white/70">{label}</span>
+											<div
+												key={key}
+												className="flex items-center gap-4 rounded-md border border-white/10 bg-white/[0.02] px-4 py-3">
+												<span className="w-24 text-sm text-white/70">
+													{label}
+												</span>
 												<input
 													type="range"
 													min={0.3}
 													max={2.5}
 													step={0.05}
 													value={scale}
-													onChange={(e) => setLogoScale(key, Number(e.target.value))}
+													onChange={(e) =>
+														setLogoScale(
+															key,
+															Number(
+																e.target.value,
+															),
+														)
+													}
 													className="flex-1 accent-white/70"
 												/>
 												<span className="w-12 text-right text-sm text-white/60">
@@ -390,7 +471,9 @@ export function SettingsPage({
 							</div>
 
 							{prefStatus && (
-								<p className="text-xs text-white/50">{prefStatus}</p>
+								<p className="text-xs text-white/50">
+									{prefStatus}
+								</p>
 							)}
 
 							<button
@@ -411,7 +494,10 @@ export function SettingsPage({
 							</p>
 							<div className="space-y-2">
 								{sessions.map((session) => (
-									<SessionItem key={session.id} session={session} />
+									<SessionItem
+										key={session.id}
+										session={session}
+									/>
 								))}
 								{sessions.length === 0 ? (
 									<p className="rounded-md border border-dashed border-white/10 px-4 py-6 text-sm text-white/45">
