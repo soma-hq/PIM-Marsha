@@ -10,6 +10,7 @@ import {
 	createNote,
 	seedPimDefaults,
 } from "../utils/api/client.jsx";
+import { ArrowLeftIcon, PlusIcon, XMarkIcon } from "../utils/icons.jsx";
 import { FancyDateField, FancySelect } from "../components/ui/Controls.jsx";
 import { COMPETENCIES } from "../utils/competencies.js";
 
@@ -58,6 +59,12 @@ const TIMELINE_VIEWS = [
 ];
 
 const COMMENT_TYPES = ["Réprimande", "Félicitations", "Note", "Alerte", "Info"];
+
+const CUSTOMER_LOGO_BY_KEY = {
+	"michou.png": "/logos/customers/michou-logo.png",
+	"doigby.png": "/logos/customers/doig-logo.png",
+	"inoxtag.png": "/logos/customers/inoxtag-logo.png",
+};
 
 const SOURCE_COLORS = {
 	planned: "border-rose-400/40 bg-rose-500/10 text-rose-200",
@@ -160,7 +167,7 @@ function formatDateOrFallback(value) {
  * @returns {JSX.Element} Modal View
  */
 
-function CreatePimModal({ organizations, onCreated, onClose }) {
+function CreatePimModal({ organizations, initialOrgId, onCreated, onClose }) {
 	const [step, setStep] = useState(1);
 	const [type, setType] = useState("");
 	const [form, setForm] = useState({
@@ -168,7 +175,7 @@ function CreatePimModal({ organizations, onCreated, onClose }) {
 		code: "",
 		startDate: "",
 		endDate: "",
-		organizationId: "",
+		organizationId: initialOrgId || "",
 	});
 	const [saving, setSaving] = useState(false);
 	const [error, setError] = useState("");
@@ -197,24 +204,40 @@ function CreatePimModal({ organizations, onCreated, onClose }) {
 		}
 	}
 
+	const orgLogoUrl = form.organizationId
+		? CUSTOMER_LOGO_BY_KEY[
+				(organizations.find((o) => o.id === form.organizationId) || {})
+					.logoKey
+			]
+		: null;
+
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4 backdrop-blur-sm">
-			<div className="w-full max-w-2xl overflow-hidden rounded-md border border-white/10 bg-[#090909] shadow-2xl">
+		<div className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4 backdrop-blur-sm">
+			<div className="modal-panel w-full max-w-2xl overflow-hidden rounded-md border border-white/10 bg-[#090909] shadow-2xl">
 				<div className="border-b border-white/10 px-5 py-4">
 					<div className="flex items-center justify-between gap-3">
-						<div>
-							<p className="text-xs uppercase tracking-[0.2em] text-white/35">
-								Nouvelle session
-							</p>
-							<h3 className="mt-1 text-2xl font-semibold">
-								Créer un PIM
-							</h3>
+						<div className="flex items-center gap-3">
+							{orgLogoUrl ? (
+								<img
+									src={orgLogoUrl}
+									alt=""
+									className="h-8 w-auto object-contain"
+								/>
+							) : null}
+							<div>
+								<p className="text-xs uppercase tracking-[0.2em] text-white/35">
+									Nouvelle session
+								</p>
+								<h3 className="mt-1 text-2xl font-semibold">
+									Créer un PIM
+								</h3>
+							</div>
 						</div>
 						<button
 							type="button"
 							onClick={onClose}
-							className="rounded-md border border-white/10 px-3 py-2 text-xs text-white/70 hover:bg-white/5">
-							Fermer
+							className="text-white/45 hover:text-white">
+							<XMarkIcon className="h-5 w-5" />
 						</button>
 					</div>
 				</div>
@@ -316,7 +339,7 @@ function CreatePimModal({ organizations, onCreated, onClose }) {
 									...(organizations || []).map((org) => ({
 										value: org.id,
 										label: org.name,
-										description: org.logoKey,
+										logoUrl: CUSTOMER_LOGO_BY_KEY[org.logoKey] || null,
 									})),
 								]}
 								onChange={(value) =>
@@ -363,7 +386,7 @@ function CreatePimModal({ organizations, onCreated, onClose }) {
  * @returns {JSX.Element} Modal View
  */
 
-function AddJuniorModal({ pimId, referents, onCreated, onClose }) {
+function AddJuniorModal({ pimId, referents, orgLogoUrl, onCreated, onClose }) {
 	const [form, setForm] = useState({
 		displayName: "",
 		discordId: "",
@@ -398,15 +421,24 @@ function AddJuniorModal({ pimId, referents, onCreated, onClose }) {
 	}
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4 backdrop-blur-sm">
-			<div className="w-full max-w-xl rounded-md border border-white/10 bg-[#090909] p-5 shadow-2xl">
+		<div className="modal-backdrop fixed inset-0 z-50 flex items-center justify-center bg-black/75 px-4 backdrop-blur-sm">
+			<div className="modal-panel w-full max-w-xl rounded-md border border-white/10 bg-[#090909] p-5 shadow-2xl">
 				<div className="mb-4 flex items-center justify-between gap-3">
-					<h3 className="text-xl font-semibold">Ajouter un junior</h3>
+					<div className="flex items-center gap-3">
+						{orgLogoUrl ? (
+							<img
+								src={orgLogoUrl}
+								alt=""
+								className="h-8 w-auto object-contain"
+							/>
+						) : null}
+						<h3 className="text-xl font-semibold">Ajouter un junior</h3>
+					</div>
 					<button
 						type="button"
 						onClick={onClose}
-						className="rounded-md border border-white/10 px-3 py-2 text-xs text-white/70 hover:bg-white/5">
-						Fermer
+						className="text-white/45 hover:text-white">
+						<XMarkIcon className="h-5 w-5" />
 					</button>
 				</div>
 
@@ -489,11 +521,11 @@ function AddJuniorModal({ pimId, referents, onCreated, onClose }) {
 
 /**
  * Renders Junior Note Modal
- * @param {{ pimId: string, junior: any, onCreated: (note: any) => void, onClose: () => void }} props Modal Props
+ * @param {{ pimId: string, junior: any, orgLogoUrl?: string|null, onCreated: (note: any) => void, onClose: () => void }} props Modal Props
  * @returns {JSX.Element} Modal View
  */
 
-function JuniorNoteModal({ pimId, junior, onCreated, onClose }) {
+function JuniorNoteModal({ pimId, junior, orgLogoUrl, onCreated, onClose }) {
 	const [category, setCategory] = useState("Note");
 	const [content, setContent] = useState("");
 	const [status, setStatus] = useState("");
@@ -529,14 +561,33 @@ function JuniorNoteModal({ pimId, junior, onCreated, onClose }) {
 	}
 
 	return (
-		<div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/80 px-4">
-			<div className="w-full max-w-lg rounded-md border border-white/10 bg-[#090909] p-5">
-				<h3 className="text-lg font-semibold">
-					Ajouter un commentaire
-				</h3>
-				<p className="mt-1 text-sm text-white/55">
-					{junior.displayName}
-				</p>
+		<div className="modal-backdrop fixed inset-0 z-[70] flex items-center justify-center bg-black/80 px-4">
+			<div className="modal-panel w-full max-w-lg rounded-md border border-white/10 bg-[#090909] p-5">
+				<div className="mb-3 flex items-start justify-between gap-3">
+					<div className="flex items-center gap-3">
+						{orgLogoUrl ? (
+							<img
+								src={orgLogoUrl}
+								alt=""
+								className="h-8 w-auto object-contain"
+							/>
+						) : null}
+						<div>
+							<h3 className="text-lg font-semibold">
+								Ajouter un commentaire
+							</h3>
+							<p className="mt-1 text-sm text-white/55">
+								{junior.displayName}
+							</p>
+						</div>
+					</div>
+					<button
+						type="button"
+						onClick={onClose}
+						className="text-white/45 hover:text-white">
+						<XMarkIcon className="h-5 w-5" />
+					</button>
+				</div>
 				<div className="mt-4 space-y-3">
 					<FancySelect
 						label="Type"
@@ -580,11 +631,18 @@ function JuniorNoteModal({ pimId, junior, onCreated, onClose }) {
 
 /**
  * Renders Junior FSI Panel
- * @param {{ junior: any, pimId: string, events: any[], notes: any[], onNoteCreated: (note: any) => void }} props Panel Props
+ * @param {{ junior: any, pimId: string, events: any[], notes: any[], orgLogoUrl?: string|null, onNoteCreated: (note: any) => void }} props Panel Props
  * @returns {JSX.Element} Panel View
  */
 
-function JuniorFSI({ junior, pimId, events, notes, onNoteCreated }) {
+function JuniorFSI({
+	junior,
+	pimId,
+	events,
+	notes,
+	orgLogoUrl,
+	onNoteCreated,
+}) {
 	const [tab, setTab] = useState("bilans");
 	const [showNoteModal, setShowNoteModal] = useState(false);
 
@@ -771,6 +829,7 @@ function JuniorFSI({ junior, pimId, events, notes, onNoteCreated }) {
 				<JuniorNoteModal
 					pimId={pimId}
 					junior={junior}
+					orgLogoUrl={orgLogoUrl}
 					onCreated={onNoteCreated}
 					onClose={() => setShowNoteModal(false)}
 				/>
@@ -781,11 +840,11 @@ function JuniorFSI({ junior, pimId, events, notes, onNoteCreated }) {
 
 /**
  * Renders Juniors Pane
- * @param {{ pimId: string, referents: any[], events: any[] }} props Pane Props
+ * @param {{ pimId: string, referents: any[], events: any[], orgLogoUrl?: string|null }} props Pane Props
  * @returns {JSX.Element} Pane View
  */
 
-function JuniorsPane({ pimId, referents, events }) {
+function JuniorsPane({ pimId, referents, events, orgLogoUrl }) {
 	const [juniors, setJuniors] = useState([]);
 	const [notes, setNotes] = useState([]);
 	const [selectedJuniorId, setSelectedJuniorId] = useState(null);
@@ -918,6 +977,7 @@ function JuniorsPane({ pimId, referents, events }) {
 					pimId={pimId}
 					events={events}
 					notes={notes}
+					orgLogoUrl={orgLogoUrl}
 					onNoteCreated={(note) =>
 						setNotes((prev) => [note, ...prev])
 					}
@@ -933,6 +993,7 @@ function JuniorsPane({ pimId, referents, events }) {
 				<AddJuniorModal
 					pimId={pimId}
 					referents={referents}
+					orgLogoUrl={orgLogoUrl}
 					onCreated={(junior) => {
 						setJuniors((previous) => [junior, ...previous]);
 						setSelectedJuniorId(junior.id);
@@ -1362,11 +1423,21 @@ function TimelinePane({ pim, events, juniors, user, onEventCreated }) {
  * @returns {JSX.Element} Page View
  */
 
-export function SessionsPage({ pims, events, organizations, users, user }) {
+export function SessionsPage({
+	pims,
+	events,
+	organizations,
+	users,
+	user,
+	prefs,
+	onPimCreated,
+	initialCreateOrgId,
+	onCreateModalMounted,
+}) {
 	const initialFromUrl = parseSearchParams();
 	const [selectedPimId, setSelectedPimId] = useState(initialFromUrl.pim);
 	const [activePimTab, setActivePimTab] = useState(initialFromUrl.tab);
-	const [showCreatePim, setShowCreatePim] = useState(false);
+	const [showCreatePim, setShowCreatePim] = useState(Boolean(initialCreateOrgId));
 	const [localPims, setLocalPims] = useState(pims || []);
 	const [localEvents, setLocalEvents] = useState(events || []);
 	const [pimJuniors, setPimJuniors] = useState([]);
@@ -1384,6 +1455,13 @@ export function SessionsPage({ pims, events, organizations, users, user }) {
 			setSelectedPimId(initialFromUrl.pim);
 		}
 	}, [initialFromUrl.pim, selectedPimId]);
+
+	useEffect(() => {
+		if (initialCreateOrgId) {
+			setShowCreatePim(true);
+			onCreateModalMounted?.();
+		}
+	}, [initialCreateOrgId]);
 
 	useEffect(() => {
 		syncPimUrl(selectedPimId, activePimTab);
@@ -1404,6 +1482,17 @@ export function SessionsPage({ pims, events, organizations, users, user }) {
 	const displayedEvents = selectedPim
 		? localEvents.filter((event) => event.pimId === selectedPim.id)
 		: [];
+	const selectedOrg = selectedPim
+		? (organizations || []).find(
+				(org) => org.id === selectedPim.organizationId,
+			)
+		: null;
+	const selectedOrgLogoUrl = selectedOrg
+		? (CUSTOMER_LOGO_BY_KEY[selectedOrg.logoKey] ?? null)
+		: null;
+	const selectedOrgLogoScale = selectedOrg?.logoKey
+		? (prefs?.logoScales?.[selectedOrg.logoKey] ?? 1)
+		: 1;
 	const referents = useMemo(
 		() =>
 			(users || []).filter((u) =>
@@ -1428,12 +1517,23 @@ export function SessionsPage({ pims, events, organizations, users, user }) {
 							<button
 								type="button"
 								onClick={() => setSelectedPimId(null)}
-								className="mb-3 rounded-md border border-white/10 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5">
-								← Retour aux sessions
+								className="mb-3 flex items-center gap-1.5 rounded-md border border-white/10 px-3 py-1.5 text-xs text-white/70 hover:bg-white/5">
+								<ArrowLeftIcon className="h-3.5 w-3.5" />
+								Retour aux sessions
 							</button>
-							<h2 className="text-3xl font-semibold">
-								{selectedPim.title}
-							</h2>
+							<div className="flex items-center gap-3">
+								{selectedOrgLogoUrl ? (
+									<img
+										src={selectedOrgLogoUrl}
+										alt=""
+										className="h-10 w-auto object-contain"
+										style={{ transform: `scale(${selectedOrgLogoScale})`, transformOrigin: "left center" }}
+									/>
+								) : null}
+								<h2 className="text-3xl font-semibold">
+									{selectedPim.title}
+								</h2>
+							</div>
 							<p className="mt-1 text-sm text-white/55">
 								{selectedPim.code} • URL liée: ?pim=
 								{selectedPim.id}
@@ -1443,8 +1543,9 @@ export function SessionsPage({ pims, events, organizations, users, user }) {
 							<button
 								type="button"
 								onClick={() => setShowCreatePim(true)}
-								className="rounded-md border border-white/15 bg-white px-4 py-3 text-sm font-semibold text-black">
-								+ Nouvelle session
+								className="flex items-center gap-1.5 rounded-md border border-white/15 bg-white px-4 py-3 text-sm font-semibold text-black">
+								<PlusIcon className="h-4 w-4" />
+								Nouvelle session
 							</button>
 						) : null}
 					</div>
@@ -1496,6 +1597,7 @@ export function SessionsPage({ pims, events, organizations, users, user }) {
 							pimId={selectedPim.id}
 							referents={referents}
 							events={displayedEvents}
+							orgLogoUrl={selectedOrgLogoUrl}
 						/>
 					) : (
 						<TimelinePane
@@ -1527,8 +1629,9 @@ export function SessionsPage({ pims, events, organizations, users, user }) {
 							<button
 								type="button"
 								onClick={() => setShowCreatePim(true)}
-								className="rounded-md border border-white/15 bg-white px-4 py-3 text-sm font-semibold text-black">
-								+ Nouvelle session
+								className="flex items-center gap-1.5 rounded-md border border-white/15 bg-white px-4 py-3 text-sm font-semibold text-black">
+								<PlusIcon className="h-4 w-4" />
+								Nouvelle session
 							</button>
 						) : null}
 					</div>
@@ -1547,6 +1650,9 @@ export function SessionsPage({ pims, events, organizations, users, user }) {
 										</p>
 										<p className="text-xs text-white/45">
 											{pim.code}
+										</p>
+										<p className="text-[10px] text-white/30">
+											{formatDateOrFallback(pim.startDate)} → {formatDateOrFallback(pim.endDate)}
 										</p>
 									</div>
 									<span className="rounded-md border border-white/10 bg-black/35 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-white/60">
@@ -1567,10 +1673,12 @@ export function SessionsPage({ pims, events, organizations, users, user }) {
 			{showCreatePim ? (
 				<CreatePimModal
 					organizations={organizations || []}
+					initialOrgId={initialCreateOrgId || null}
 					onCreated={(pim) => {
 						setLocalPims((previous) => [pim, ...previous]);
 						setSelectedPimId(pim.id);
 						setShowCreatePim(false);
+						onPimCreated?.(pim);
 					}}
 					onClose={() => setShowCreatePim(false)}
 				/>
