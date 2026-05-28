@@ -1,6 +1,11 @@
 import React from "react";
 
 import { buildHeaderTabs } from "../utils/page/structures/pageStructure.jsx";
+import {
+	ChevronDownIcon,
+	Cog6ToothIcon,
+	ArrowRightOnRectangleIcon,
+} from "../utils/icons.jsx";
 
 /**
  * Renders Main Header
@@ -51,13 +56,17 @@ export function HeaderBar({
 							alt={user?.name || "Avatar"}
 							className="h-8 w-8 rounded-full object-cover"
 							onError={(event) => {
-								event.currentTarget.src =
-									"/logos/michou-logo.png";
+								if (!event.currentTarget.dataset.fallback) {
+									event.currentTarget.dataset.fallback = "1";
+									event.currentTarget.src =
+										"/logos/michou-logo.png";
+								}
 							}}
 						/>
 						<span className="text-sm font-medium text-white/90">
 							{user?.name || "Utilisateur"}
 						</span>
+						<ChevronDownIcon className="h-3.5 w-3.5 text-white/45" />
 					</button>
 
 					{menuOpen ? (
@@ -71,13 +80,15 @@ export function HeaderBar({
 							<button
 								type="button"
 								onClick={onOpenProfile}
-								className="block w-full px-3 py-2 text-left text-sm text-white/85 hover:bg-white/10">
+								className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-white/85 hover:bg-white/10">
+								<Cog6ToothIcon className="h-4 w-4 text-white/45" />
 								Paramètres
 							</button>
 							<button
 								type="button"
 								onClick={onLogout}
-								className="block w-full px-3 py-2 text-left text-sm text-white/85 hover:bg-white/10">
+								className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-white/85 hover:bg-white/10">
+								<ArrowRightOnRectangleIcon className="h-4 w-4 text-white/45" />
 								Déconnexion
 							</button>
 						</div>

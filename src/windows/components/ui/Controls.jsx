@@ -41,7 +41,7 @@ function buildCalendarMatrix(year, month) {
 
 /**
  * Renders Fancy Select
- * @param {{ label?: string, value: string, options: Array<{ value: string, label: string, description?: string }>, onChange: (value: string) => void, placeholder?: string }} props Select Props
+ * @param {{ label?: string, value: string, options: Array<{ value: string, label: string, description?: string, logoUrl?: string|null }>, onChange: (value: string) => void, placeholder?: string }} props Select Props
  * @returns {JSX.Element} Select View
  */
 
@@ -83,9 +83,18 @@ export function FancySelect({
 				type="button"
 				onClick={() => setOpen((prev) => !prev)}
 				className="flex h-12 w-full items-center justify-between gap-3 rounded-md border border-white/10 bg-black/45 px-4 text-left text-white transition hover:border-white/25 hover:bg-white/[0.04]">
-				<span className={selected ? "text-white" : "text-white/40"}>
-					{selected ? selected.label : placeholder}
-				</span>
+				<div className="flex min-w-0 flex-1 items-center gap-2">
+					{selected?.logoUrl ? (
+						<img
+							src={selected.logoUrl}
+							alt=""
+							className="h-5 w-auto shrink-0 object-contain"
+						/>
+					) : null}
+					<span className={selected ? "text-white" : "text-white/40"}>
+						{selected ? selected.label : placeholder}
+					</span>
+				</div>
 				<span className="text-xs text-white/45">▾</span>
 			</button>
 
@@ -99,7 +108,14 @@ export function FancySelect({
 								onChange(option.value);
 								setOpen(false);
 							}}
-							className={`flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-white/5 ${option.value === value ? "bg-white/[0.06]" : ""}`}>
+							className={`flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-white/5 ${option.value === value ? "bg-white/[0.06]" : ""}`}>
+							{option.logoUrl ? (
+								<img
+									src={option.logoUrl}
+									alt=""
+									className="h-5 w-auto shrink-0 object-contain opacity-80"
+								/>
+							) : null}
 							<div className="min-w-0 flex-1">
 								<div className="text-sm font-medium text-white">
 									{option.label}

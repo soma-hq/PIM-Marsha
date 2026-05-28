@@ -8,12 +8,13 @@ import {
 	fetchAdminLogs,
 	fetchMySessions,
 } from "../utils/api/client.jsx";
-import { fetchActivity } from "../utils/api/client.jsx";
+import { fetchActivity, fetchPrefs } from "../utils/api/client.jsx";
 import {
 	createPageStructure,
 	withSecurityBoundary,
 } from "../utils/page/structures/pageStructure.jsx";
 import { ForcePasswordModal } from "../components/ForcePasswordModal.jsx";
+import { ToastProvider } from "../components/ui/Toast.jsx";
 
 import { LoginPage } from "./LoginPage.jsx";
 import { HomePage } from "./HomePage.jsx";
@@ -68,10 +69,12 @@ export function App() {
 	const [logs, setLogs] = useState([]);
 	const [activity, setActivity] = useState([]);
 	const [sessionsPayload, setSessionsPayload] = useState(null);
+	const [sessionsCreateOrgId, setSessionsCreateOrgId] = useState(null);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [error, setError] = useState("");
 	const [pageLoading, setPageLoading] = useState(false);
 	const [reloadTick, setReloadTick] = useState(0);
+	const [prefs, setPrefs] = useState({ toastDurationMs: 4000, logoScales: {} });
 
 	const isAuthenticated = Boolean(user);
 
@@ -124,6 +127,11 @@ export function App() {
 				setActivity(activityRes.activities || []);
 				setSessionsPayload(sessionsRes);
 
+				try {
+					const prefsRes = await fetchPrefs();
+					if (mounted) setPrefs(prefsRes.prefs || { toastDurationMs: 4000, logoScales: {} });
+				} catch { /* ignore prefs errors */ }
+
 				if (["super_admin", "responsable"].includes(role)) {
 					const [orgRes, usersRes] = await Promise.all([
 						apiRequest("/organizations"),
@@ -157,16 +165,33 @@ export function App() {
 						user={user}
 						organizations={organizations}
 						pims={pims}
+						onNavigateToSessions={(orgId) => {
+							setSessionsCreateOrgId(orgId || null);
+							setActiveTab("sessions");
+						}}
 					/>
 				);
 			case "sessions":
 				return (
 					<SecuredSessionsPage
 						user={user}
+						prefs={prefs}
 						pims={pims}
 						events={events}
 						organizations={organizations}
 						users={users}
+						onPimCreated={(savedPim) => {
+							setPims((prev) => {
+								const exists = prev.some(
+									(item) => item.id === savedPim.id,
+								);
+								return exists ? prev : [savedPim, ...prev];
+							});
+						}}
+						initialCreateOrgId={sessionsCreateOrgId}
+						onCreateModalMounted={() =>
+							setSessionsCreateOrgId(null)
+						}
 					/>
 				);
 			case "admin":
@@ -196,7 +221,9 @@ export function App() {
 					<SecuredSettingsPage
 						user={user}
 						sessionsPayload={sessionsPayload}
+						prefs={prefs}
 						onUserUpdated={(updatedUser) => setUser(updatedUser)}
+						onPrefsUpdated={(p) => setPrefs(p)}
 						onSecurityChanged={async () => {
 							await onLogout();
 						}}
@@ -222,6 +249,8 @@ export function App() {
 		users,
 		logs,
 		sessionsPayload,
+		sessionsCreateOrgId,
+		prefs,
 	]);
 
 	/**
@@ -338,6 +367,7 @@ export function App() {
 	}
 
 	return (
+		<ToastProvider durationMs={prefs.toastDurationMs}>
 		<div className="min-h-screen bg-black text-white">
 			<HeaderBar
 				user={user}
@@ -381,5 +411,6 @@ export function App() {
 				/>
 			) : null}
 		</div>
+		</ToastProvider>
 	);
 }

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { ChevronDownIcon, ChevronUpIcon } from "../utils/icons.jsx";
 
 // Home Page Component
 const SOURCE_CONFIG = [
@@ -95,23 +96,21 @@ export function HomePage({ pims, logs, activity, user }) {
 
 	return (
 		<section className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-			<div className="flex items-center gap-3 rounded-md border border-white/10 bg-white/[0.03] px-4 py-3">
+			<div className="flex items-center gap-3 px-4 py-3">
 				<img
 					src={user?.avatarUrl || "/logos/michou-logo.png"}
 					alt={user?.name || "Avatar"}
 					className="h-11 w-11 rounded-full object-cover"
 					onError={(event) => {
-						event.currentTarget.src = "/logos/michou-logo.png";
+						if (!event.currentTarget.dataset.fallback) {
+							event.currentTarget.dataset.fallback = "1";
+							event.currentTarget.src = "/logos/michou-logo.png";
+						}
 					}}
 				/>
-				<div>
-					<p className="text-xs uppercase tracking-[0.2em] text-white/40">
-						Accueil
-					</p>
-					<p className="text-lg font-semibold text-white">
-						Bienvenue {user?.name || "utilisateur"}
-					</p>
-				</div>
+				<p className="text-lg font-semibold text-white">
+					Bienvenue {user?.name || "utilisateur"}
+				</p>
 			</div>
 
 			<div className="space-y-3 rounded-md border border-white/10 bg-[#090909] p-5">
@@ -146,7 +145,12 @@ export function HomePage({ pims, logs, activity, user }) {
 												[group.key]: !isExpanded,
 											}))
 										}
-										className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-white/75 hover:bg-white/5">
+										className="flex items-center gap-1.5 rounded-md border border-white/20 px-3 py-1.5 text-xs text-white/75 hover:bg-white/5">
+										{isExpanded ? (
+											<ChevronUpIcon className="h-3.5 w-3.5" />
+										) : (
+											<ChevronDownIcon className="h-3.5 w-3.5" />
+										)}
 										{isExpanded
 											? "Voir moins"
 											: "Voir plus"}

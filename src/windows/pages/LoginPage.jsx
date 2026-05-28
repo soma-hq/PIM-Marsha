@@ -77,8 +77,8 @@ export function LoginPage({ onLoginSuccess }) {
 	return (
 		<div className="relative min-h-screen bg-black text-white">
 			<div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.07),_transparent_45%)]" />
-			<div className="relative mx-auto grid min-h-screen max-w-[1480px] lg:grid-cols-[0.95fr_1fr]">
-				<section className="relative hidden items-center justify-start px-3 py-4 lg:flex">
+			<div className="relative grid min-h-screen w-full lg:grid-cols-[0.95fr_1fr]">
+				<section className="relative hidden items-center justify-start p-4 lg:flex">
 					<div className="relative h-full w-full overflow-hidden rounded-lg">
 						<img
 							src="/assets/banners/inoxtag-banner.png"
