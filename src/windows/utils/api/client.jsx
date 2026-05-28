@@ -257,3 +257,22 @@ export async function createNote(payload) {
 export async function fetchActivity() {
 	return apiRequest("/activity");
 }
+
+/**
+ * Fetches User Preferences
+ * @returns {Promise<any>} Prefs Payload
+ */
+
+export async function fetchPrefs() {
+	return apiRequest("/prefs");
+}
+
+/**
+ * Updates User Preferences
+ * @param {object} payload Prefs to update
+ * @returns {Promise<any>} Updated Prefs
+ */
+
+export async function updatePrefs(payload) {
+	return apiRequest("/prefs", { method: "PATCH", body: JSON.stringify(payload) });
+}
