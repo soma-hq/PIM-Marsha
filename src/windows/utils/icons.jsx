@@ -2,6 +2,7 @@ export {
 	ArrowLeftIcon,
 	ArrowRightOnRectangleIcon,
 	ArrowPathIcon,
+	Bars3Icon,
 	PlusIcon,
 	XMarkIcon,
 	ChevronDownIcon,
