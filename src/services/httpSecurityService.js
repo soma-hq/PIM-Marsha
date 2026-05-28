@@ -1,9 +1,10 @@
+const { SECURITY_HEADERS } = require("../utils/constants");
+
 /**
- * Parses The CORS Origin Configuration Into A Clean Allow List
-
- * @param {string|null|undefined} corsOrigin Comma Separated Origins
-
- * @returns {string[]} Normalized Allowed Origins */
+ * Parses the CORS origin configuration into a clean allow list
+ * @param {string|null|undefined} corsOrigin Comma-separated origins string
+ * @returns {string[]} Normalized allowed origins
+ */
 
 function parseAllowedOrigins(corsOrigin) {
 	return String(corsOrigin || "")
@@ -13,37 +14,24 @@ function parseAllowedOrigins(corsOrigin) {
 }
 
 /**
- * Applies Security Headers To The Current Response
-
- * @param {import("express").Response} res Express Response Instance
-
- * @returns {void} Nothing */
+ * Applies security hardening headers to the current response
+ * @param {import("express").Response} res Express response instance
+ * @returns {void} Nothing
+ */
 
 function applySecurityHeaders(res) {
-	// basic hardening
-	res.setHeader("X-Content-Type-Options", "nosniff");
-	res.setHeader("X-Frame-Options", "DENY");
-	res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
-	res.setHeader("Permissions-Policy", "geolocation=(), microphone=()");
+	for (const [header, value] of Object.entries(SECURITY_HEADERS)) {
+		res.setHeader(header, value);
+	}
 }
 
 /**
- * Builds A CORS Origin Resolver Callback
-
- * @param {string[]} allowedOrigins Allowed Origin Values
-
- * @returns {(origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) => void} CORS Origin Resolver */
+ * Builds a CORS origin resolver callback from an allow list
+ * @param {string[]} allowedOrigins Allowed origin values
+ * @returns {(origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) => void} CORS origin resolver
+ */
 
 function buildCorsOriginResolver(allowedOrigins) {
-	/**
- * Resolves A Single Origin Against The Allow List
-
- * @param {string|undefined} origin Current Request Origin
-
- * @param {(error: Error | null, allow?: boolean) => void} callback CORS Callback
-
- * @returns {void} Nothing	 */
-
 	return function resolveOrigin(origin, callback) {
 		if (!origin) return callback(null, true);
 		if (allowedOrigins.length === 0) return callback(null, true);

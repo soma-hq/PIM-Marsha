@@ -1,9 +1,11 @@
-const TIMELINE_SOURCES = ["planned", "responsable", "referent"];
+const { TIMELINE_SOURCE, ROLES } = require("../utils/constants");
+
+const TIMELINE_SOURCES = Object.values(TIMELINE_SOURCE);
 
 /**
- * Normalizes A Timeline Source Value
- * @param {string|null|undefined} value Timeline Source Candidate
- * @returns {"planned"|"responsable"|"referent"|null} Normalized Source Or Null
+ * Normalizes a timeline source value
+ * @param {string|null|undefined} value Timeline source candidate
+ * @returns {"planned"|"responsable"|"referent"|null} Normalized source or null
  */
 
 function normalizeTimelineSource(value) {
@@ -14,10 +16,10 @@ function normalizeTimelineSource(value) {
 }
 
 /**
- * Resolves A Timeline Source From Input Or Actor Role
- * @param {string|null|undefined} preferredSource Preferred Source Value
- * @param {string|null|undefined} actorRole Actor Role Used As Fallback
- * @returns {"planned"|"responsable"|"referent"} Resolved Timeline Source
+ * Resolves a timeline source from input or actor role as fallback
+ * @param {string|null|undefined} preferredSource Preferred source value
+ * @param {string|null|undefined} actorRole Actor role used as fallback
+ * @returns {"planned"|"responsable"|"referent"} Resolved timeline source
  */
 
 function resolveTimelineSource(preferredSource, actorRole) {
@@ -26,8 +28,9 @@ function resolveTimelineSource(preferredSource, actorRole) {
 	const role = String(actorRole || "")
 		.trim()
 		.toLowerCase();
-	if (["responsable", "super_admin"].includes(role)) return "responsable";
-	return "referent";
+	if ([ROLES.RESPONSABLE, ROLES.SUPER_ADMIN].includes(role))
+		return TIMELINE_SOURCE.RESPONSABLE;
+	return TIMELINE_SOURCE.REFERENT;
 }
 
 module.exports = {
