@@ -21,8 +21,13 @@ const {
 } = require("../services/roleService");
 const { resolveTimelineSource } = require("../services/timelineSourceService");
 const { seedPimDefaults } = require("../services/pimSeedService");
-
-const DEFAULT_CREATED_USER_PASSWORD = "ChangeMe123!";
+const {
+	ROLES,
+	AUDIT_ACTION,
+	RESOURCE,
+	AUTH,
+	SERVICE_NAME,
+} = require("../utils/constants");
 
 module.exports = function buildApi(app) {
 	const router = express.Router();
@@ -30,7 +35,7 @@ module.exports = function buildApi(app) {
 	const models = app.database.models;
 
 	router.get("/health", (_req, res) => {
-		res.json({ ok: true, service: "pim-marsha-api" });
+		res.json({ ok: true, service: SERVICE_NAME });
 	});
 
 	router.get(
@@ -62,8 +67,8 @@ module.exports = function buildApi(app) {
 			await writeAuditLog(app, {
 				actorId: req.auth.sub,
 				actorEmail: req.auth.email,
-				actionType: "ORGANIZATION_CREATE",
-				resourceType: "organization",
+				actionType: AUDIT_ACTION.ORGANIZATION_CREATE,
+				resourceType: RESOURCE.ORGANIZATION,
 				resourceId: organization.id,
 				metadata: { name: organization.name },
 			});
@@ -87,8 +92,8 @@ module.exports = function buildApi(app) {
 			await writeAuditLog(app, {
 				actorId: req.auth.sub,
 				actorEmail: req.auth.email,
-				actionType: "ORGANIZATION_UPDATE",
-				resourceType: "organization",
+				actionType: AUDIT_ACTION.ORGANIZATION_UPDATE,
+				resourceType: RESOURCE.ORGANIZATION,
 				resourceId: organization.id,
 				metadata: { changed: Object.keys(req.body || {}) },
 			});
@@ -111,8 +116,8 @@ module.exports = function buildApi(app) {
 			await writeAuditLog(app, {
 				actorId: req.auth.sub,
 				actorEmail: req.auth.email,
-				actionType: "ORGANIZATION_DELETE",
-				resourceType: "organization",
+				actionType: AUDIT_ACTION.ORGANIZATION_DELETE,
+				resourceType: RESOURCE.ORGANIZATION,
 				resourceId: req.params.id,
 			});
 			return res.status(204).send();
@@ -120,22 +125,23 @@ module.exports = function buildApi(app) {
 	);
 
 	router.post("/auth/register", async (req, res) => {
-		// Registration gate
 		const { email, name, firstName, lastName, password, role } = req.body;
 		if (!email || (!name && (!firstName || !lastName)) || !password) {
 			return res.status(400).json({ message: "Champs requis manquants" });
 		}
 
 		const usersCount = await models.users.count();
-		const requestedRole = normalizeInputRole(role || "membre");
+		const requestedRole = normalizeInputRole(
+			role || app.config.api.defaultUserRole,
+		);
 		if (!ALLOWED_ROLES.includes(requestedRole)) {
 			return res.status(400).json({ message: "Role invalide" });
 		}
 
 		if (usersCount > 0) {
-			const header = req.headers.authorization || "";
-			const bearerToken = header.startsWith("Bearer ")
-				? header.slice(7)
+			const header = req.headers[AUTH.HEADER] || "";
+			const bearerToken = header.startsWith(AUTH.BEARER_PREFIX)
+				? header.slice(AUTH.BEARER_PREFIX.length)
 				: null;
 			const cookieToken = req.cookies?.[app.config.cookie.name] || null;
 			const token = bearerToken || cookieToken;
@@ -149,9 +155,11 @@ module.exports = function buildApi(app) {
 			try {
 				const payload = jwt.verify(token, app.config.jwtSecret);
 				if (
-					!["super_admin", "owner", "responsable"].includes(
-						payload.role,
-					)
+					![
+						ROLES.SUPER_ADMIN,
+						ROLES.OWNER,
+						ROLES.RESPONSABLE,
+					].includes(payload.role)
 				) {
 					return res.status(403).json({
 						message: "Role insuffisant pour creer un utilisateur",
@@ -169,7 +177,10 @@ module.exports = function buildApi(app) {
 				.json({ message: "Utilisateur deja existant" });
 		}
 
-		const passwordHash = await bcrypt.hash(password, 10);
+		const passwordHash = await bcrypt.hash(
+			password,
+			app.config.security.bcryptRounds,
+		);
 		const user = await models.users.create({
 			email,
 			name: name || `${firstName} ${lastName}`,
@@ -212,8 +223,8 @@ module.exports = function buildApi(app) {
 		await writeAuditLog(app, {
 			actorId: user.id,
 			actorEmail: user.email,
-			actionType: "LOGIN",
-			resourceType: "auth",
+			actionType: AUDIT_ACTION.LOGIN,
+			resourceType: RESOURCE.AUTH,
 			resourceId: user.id,
 			metadata: {
 				userAgent: req.headers["user-agent"] || null,
@@ -228,8 +239,8 @@ module.exports = function buildApi(app) {
 		await writeAuditLog(app, {
 			actorId: _req.auth?.sub,
 			actorEmail: _req.auth?.email,
-			actionType: "LOGOUT",
-			resourceType: "auth",
+			actionType: AUDIT_ACTION.LOGOUT,
+			resourceType: RESOURCE.AUTH,
 			resourceId: _req.auth?.sub,
 		});
 		clearSessionCookie(app, res);
@@ -255,10 +266,12 @@ module.exports = function buildApi(app) {
 		const sessions = await models.audit_logs.findAll({
 			where: {
 				actorId: user.id,
-				actionType: { [Op.in]: ["LOGIN", "LOGOUT"] },
+				actionType: {
+					[Op.in]: [AUDIT_ACTION.LOGIN, AUDIT_ACTION.LOGOUT],
+				},
 			},
 			order: [["createdAt", "DESC"]],
-			limit: 12,
+			limit: app.config.api.sessionsLimit,
 		});
 
 		return res.json({
@@ -288,8 +301,8 @@ module.exports = function buildApi(app) {
 		await writeAuditLog(app, {
 			actorId: user.id,
 			actorEmail: user.email,
-			actionType: "SESSION_REVOKE_ALL",
-			resourceType: "auth",
+			actionType: AUDIT_ACTION.SESSION_REVOKE_ALL,
+			resourceType: RESOURCE.AUTH,
 			resourceId: user.id,
 		});
 
@@ -311,16 +324,17 @@ module.exports = function buildApi(app) {
 		if (Object.prototype.hasOwnProperty.call(req.body, "avatarUrl"))
 			payload.avatarUrl = req.body.avatarUrl;
 		if (req.body.password) {
-			payload.passwordHash = await bcrypt.hash(req.body.password, 10);
+			payload.passwordHash = await bcrypt.hash(
+				req.body.password,
+				app.config.security.bcryptRounds,
+			);
 			payload.mustChangePassword = false;
 		}
-
-		await user.update(payload);
 		await writeAuditLog(app, {
 			actorId: user.id,
 			actorEmail: user.email,
-			actionType: "PROFILE_UPDATE",
-			resourceType: "user",
+			actionType: AUDIT_ACTION.PROFILE_UPDATE,
+			resourceType: RESOURCE.USER,
 			resourceId: user.id,
 			metadata: {
 				changed: Object.keys(payload),
@@ -356,7 +370,6 @@ module.exports = function buildApi(app) {
 		auth,
 		requireRole("responsable"),
 		async (req, res) => {
-			// Input parse
 			const {
 				email,
 				name,
@@ -377,9 +390,11 @@ module.exports = function buildApi(app) {
 				return res
 					.status(409)
 					.json({ message: "Utilisateur deja existant" });
-			const rawPassword = password || DEFAULT_CREATED_USER_PASSWORD;
+			const rawPassword = password || app.config.api.defaultUserPassword;
 			const mustChangePassword = !password;
-			const normalizedRole = normalizeInputRole(role || "membre");
+			const normalizedRole = normalizeInputRole(
+				role || app.config.api.defaultUserRole,
+			);
 			if (!ALLOWED_ROLES.includes(normalizedRole)) {
 				return res.status(400).json({ message: "Role invalide" });
 			}
@@ -396,15 +411,18 @@ module.exports = function buildApi(app) {
 				lastName,
 				avatarUrl: avatarUrl || null,
 				organizationId: organizationId || null,
-				passwordHash: await bcrypt.hash(rawPassword, 10),
+				passwordHash: await bcrypt.hash(
+					rawPassword,
+					app.config.security.bcryptRounds,
+				),
 				mustChangePassword,
 				role: toDbRole(normalizedRole),
 			});
 			await writeAuditLog(app, {
 				actorId: req.auth.sub,
 				actorEmail: req.auth.email,
-				actionType: "USER_CREATE",
-				resourceType: "user",
+				actionType: AUDIT_ACTION.USER_CREATE,
+				resourceType: RESOURCE.USER,
 				resourceId: user.id,
 				metadata: {
 					email: user.email,
@@ -447,7 +465,10 @@ module.exports = function buildApi(app) {
 				payload.isActive = Boolean(req.body.isActive);
 			}
 			if (req.body.password) {
-				payload.passwordHash = await bcrypt.hash(req.body.password, 10);
+				payload.passwordHash = await bcrypt.hash(
+					req.body.password,
+					app.config.security.bcryptRounds,
+				);
 				if (
 					Object.prototype.hasOwnProperty.call(
 						req.body,
@@ -464,8 +485,8 @@ module.exports = function buildApi(app) {
 			await writeAuditLog(app, {
 				actorId: req.auth.sub,
 				actorEmail: req.auth.email,
-				actionType: "USER_UPDATE",
-				resourceType: "user",
+				actionType: AUDIT_ACTION.USER_UPDATE,
+				resourceType: RESOURCE.USER,
 				resourceId: user.id,
 				metadata: {
 					changed: Object.keys(payload),
@@ -490,8 +511,8 @@ module.exports = function buildApi(app) {
 			await writeAuditLog(app, {
 				actorId: req.auth.sub,
 				actorEmail: req.auth.email,
-				actionType: "USER_DELETE",
-				resourceType: "user",
+				actionType: AUDIT_ACTION.USER_DELETE,
+				resourceType: RESOURCE.USER,
 				resourceId: req.params.id,
 			});
 			return res.status(204).send();
@@ -505,18 +526,20 @@ module.exports = function buildApi(app) {
 		async (req, res) => {
 			const where = {};
 			if (req.query.kind === "connection") {
-				where.actionType = { [Op.in]: ["LOGIN", "LOGOUT"] };
+				where.actionType = {
+					[Op.in]: [AUDIT_ACTION.LOGIN, AUDIT_ACTION.LOGOUT],
+				};
 			}
 			if (req.query.kind === "modification") {
 				where.actionType = {
-					[Op.notIn]: ["LOGIN", "LOGOUT"],
+					[Op.notIn]: [AUDIT_ACTION.LOGIN, AUDIT_ACTION.LOGOUT],
 				};
 			}
 
 			const logs = await models.audit_logs.findAll({
 				where,
 				order: [["createdAt", "DESC"]],
-				limit: Number(req.query.limit || 100),
+				limit: Number(req.query.limit || app.config.api.auditLogsLimit),
 			});
 			return res.json({ logs });
 		},
@@ -530,8 +553,8 @@ module.exports = function buildApi(app) {
 		await writeAuditLog(app, {
 			actorId: req.auth.sub,
 			actorEmail: req.auth.email,
-			actionType: "PIM_CREATE",
-			resourceType: "pim",
+			actionType: AUDIT_ACTION.PIM_CREATE,
+			resourceType: RESOURCE.PIM,
 			resourceId: pim.id,
 			metadata: { title: pim.title, code: pim.code },
 		});
@@ -563,8 +586,8 @@ module.exports = function buildApi(app) {
 			await writeAuditLog(app, {
 				actorId: req.auth.sub,
 				actorEmail: req.auth.email,
-				actionType: "PIM_UPDATE",
-				resourceType: "pim",
+				actionType: AUDIT_ACTION.PIM_UPDATE,
+				resourceType: RESOURCE.PIM,
 				resourceId: pim.id,
 				metadata: { changed: Object.keys(req.body || {}) },
 			});
@@ -585,8 +608,8 @@ module.exports = function buildApi(app) {
 			await writeAuditLog(app, {
 				actorId: req.auth.sub,
 				actorEmail: req.auth.email,
-				actionType: "PIM_DELETE",
-				resourceType: "pim",
+				actionType: AUDIT_ACTION.PIM_DELETE,
+				resourceType: RESOURCE.PIM,
 				resourceId: req.params.id,
 			});
 			return res.status(204).send();
@@ -1063,17 +1086,17 @@ module.exports = function buildApi(app) {
 		const [recentJuniors, recentEvents, recentPims] = await Promise.all([
 			models.juniors.findAll({
 				order: [["createdAt", "DESC"]],
-				limit: 10,
+				limit: app.config.api.activityRecentJuniorsLimit,
 				attributes: ["id", "displayName", "pimId", "createdAt"],
 			}),
 			models.feed_events.findAll({
 				order: [["createdAt", "DESC"]],
-				limit: 10,
+				limit: app.config.api.activityRecentEventsLimit,
 				attributes: ["id", "title", "eventType", "pimId", "createdAt"],
 			}),
 			models.pims.findAll({
 				order: [["createdAt", "DESC"]],
-				limit: 5,
+				limit: app.config.api.activityRecentPimsLimit,
 				attributes: ["id", "title", "code", "type", "createdAt"],
 			}),
 		]);
@@ -1101,9 +1124,45 @@ module.exports = function buildApi(app) {
 			})),
 		]
 			.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-			.slice(0, 20);
+			.slice(0, app.config.api.activityTotalLimit);
 
 		return res.json({ activities });
+	});
+
+	// GET /api/prefs — fetch user preferences from Redis
+	router.get("/prefs", auth, async (req, res) => {
+		try {
+			const key = `pref:user:${req.authUser.id}`;
+			const raw = await app.redis.redisSetter?.get(key);
+			const prefs = raw ? JSON.parse(raw) : {};
+			return res.json({
+				prefs: { toastDurationMs: 4000, logoScales: {}, ...prefs },
+			});
+		} catch {
+			return res.json({
+				prefs: { toastDurationMs: 4000, logoScales: {} },
+			});
+		}
+	});
+
+	// PATCH /api/prefs — update user preferences in Redis
+	router.patch("/prefs", auth, async (req, res) => {
+		try {
+			const key = `pref:user:${req.authUser.id}`;
+			const raw = await app.redis.redisSetter?.get(key);
+			const current = raw
+				? JSON.parse(raw)
+				: { toastDurationMs: 4000, logoScales: {} };
+			const updated = { ...current, ...req.body };
+			await app.redis.redisSetter?.set(key, JSON.stringify(updated));
+			return res.json({ prefs: updated });
+		} catch {
+			return res
+				.status(500)
+				.json({
+					message: "Impossible de sauvegarder les préférences.",
+				});
+		}
 	});
 
 	router.use((error, _req, res, _next) => {

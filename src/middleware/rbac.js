@@ -3,10 +3,10 @@ const config = require("../config");
 const ORDERED_ROLES = config.roles;
 
 /**
- * Checks Role Rank
- * @param {string} userRole User Role
- * @param {string} requiredRole Required Role
- * @returns {boolean} Access Result
+ * Checks whether a user meets the minimum role rank
+ * @param {string} userRole Current user role
+ * @param {string} requiredRole Minimum required role
+ * @returns {boolean} True when rank is sufficient
  */
 
 function hasMinimumRole(userRole, requiredRole) {
@@ -16,9 +16,9 @@ function hasMinimumRole(userRole, requiredRole) {
 }
 
 /**
- * Creates RBAC Middleware
- * @param {string} role Required Role
- * @returns {(req: any, res: any, next: Function) => any} Express Middleware
+ * Creates RBAC middleware requiring a minimum role
+ * @param {string} role Minimum required role
+ * @returns {(req: any, res: any, next: Function) => any} Express middleware
  */
 
 module.exports = function requireRole(role) {

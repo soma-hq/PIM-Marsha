@@ -1,29 +1,21 @@
 const jwt = require("jsonwebtoken");
+const { AUTH } = require("../utils/constants");
 
 /**
- * Builds The Authentication Middleware
- * @param {{ config: any, database: any }} app Application Container
- * @returns {import("express").RequestHandler} Express Middleware
+ * Builds the authentication middleware
+ * @param {{ config: any, database: any }} app Application container
+ * @returns {import("express").RequestHandler} Express middleware
  */
 
 module.exports = function auth(app) {
-	/**
-	 * Validates Token, Account State, And Session Version
-	 * @param {import("express").Request} req Express Request
-	 * @param {import("express").Response} res Express Response
-	 * @param {import("express").NextFunction} next Express Next Callback
-	 * @returns {Promise<void|import("express").Response>} Middleware Completion
-	 */
-
 	return async (req, res, next) => {
-		const header = req.headers.authorization || "";
-		const bearerToken = header.startsWith("Bearer ")
-			? header.slice(7)
+		const header = req.headers[AUTH.HEADER] || "";
+		const bearerToken = header.startsWith(AUTH.BEARER_PREFIX)
+			? header.slice(AUTH.BEARER_PREFIX.length)
 			: null;
 		const cookieToken = req.cookies?.[app.config.cookie.name] || null;
 		const token = bearerToken || cookieToken;
 
-		// Auth gate
 		if (!token) return res.status(401).json({ message: "Token manquant" });
 
 		try {
@@ -43,7 +35,6 @@ module.exports = function auth(app) {
 				return res.status(401).json({ message: "Session expiree" });
 			}
 
-			// Auth context
 			req.auth = payload;
 			req.authUser = user;
 			return next();

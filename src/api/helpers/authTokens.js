@@ -1,9 +1,10 @@
 const jwt = require("jsonwebtoken");
+const { AUTH } = require("../../utils/constants");
 
 /**
- * Normalizes Role Value
- * @param {string|null|undefined} role Raw Role
- * @returns {string} Normalized Role
+ * Normalizes a role value to lowercase
+ * @param {string|null|undefined} role Raw role
+ * @returns {string} Normalized role
  */
 
 function normalizeRole(role) {
@@ -11,9 +12,9 @@ function normalizeRole(role) {
 }
 
 /**
- * Builds Public User Shape
- * @param {any} user User Record
- * @returns {object} Safe User Payload
+ * Builds the public-safe user shape
+ * @param {any} user User record
+ * @returns {object} Safe user payload
  */
 
 function pickUser(user) {
@@ -35,10 +36,10 @@ function pickUser(user) {
 }
 
 /**
- * Signs Session Token
- * @param {any} app App Container
- * @param {any} user User Record
- * @returns {string} Signed Token
+ * Signs a session JWT for the given user
+ * @param {any} app App container
+ * @param {any} user User record
+ * @returns {string} Signed JWT
  */
 
 function issueToken(app, user) {
@@ -50,15 +51,15 @@ function issueToken(app, user) {
 			sessionVersion: Number(user.sessionVersion || 0),
 		},
 		app.config.jwtSecret,
-		{ expiresIn: "12h" },
+		{ expiresIn: app.config.security.jwtExpiry },
 	);
 }
 
 /**
- * Sets Session Cookie
- * @param {any} app App Container
- * @param {any} res Express Response
- * @param {string} token Session Token
+ * Sets the session cookie on the response
+ * @param {any} app App container
+ * @param {any} res Express response
+ * @param {string} token Session token
  * @returns {void} Nothing
  */
 
@@ -68,19 +69,19 @@ function setSessionCookie(app, res, token) {
 		sameSite: app.config.cookie.sameSite,
 		secure: app.config.cookie.secure,
 		maxAge: app.config.cookie.maxAge,
-		path: "/",
+		path: AUTH.COOKIE_PATH,
 	});
 }
 
 /**
- * Clears Session Cookie
- * @param {any} app App Container
- * @param {any} res Express Response
+ * Clears the session cookie from the response
+ * @param {any} app App container
+ * @param {any} res Express response
  * @returns {void} Nothing
  */
 
 function clearSessionCookie(app, res) {
-	res.clearCookie(app.config.cookie.name, { path: "/" });
+	res.clearCookie(app.config.cookie.name, { path: AUTH.COOKIE_PATH });
 }
 
 module.exports = {

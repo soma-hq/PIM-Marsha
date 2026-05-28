@@ -1,15 +1,21 @@
+const config = require("../../config");
+const {
+	PAGE_TYPES,
+	EVENT_TYPE,
+	TRAINING_CATEGORY,
+} = require("../../utils/constants");
+
 /**
- * Builds Default PIM Pages
- * @returns {Array<{ title: string, slug: string, type: string, isRequired: boolean, position: number, content: string }>} Pages List
+ * Builds the default PIM pages list
+ * @returns {Array<{ title: string, slug: string, type: string, isRequired: boolean, position: number, content: string }>} Pages list
  */
 
 function defaultPimPages() {
-	// Default content
 	return [
 		{
 			title: "Notes générales",
 			slug: "notes-generales",
-			type: "notes_generales",
+			type: PAGE_TYPES.NOTES_GENERALES,
 			isRequired: true,
 			position: 1,
 			content: "Espace de notes globales pour toute l'équipe de tutorat.",
@@ -17,7 +23,7 @@ function defaultPimPages() {
 		{
 			title: "Remarques",
 			slug: "remarques",
-			type: "remarques",
+			type: PAGE_TYPES.REMARQUES,
 			isRequired: true,
 			position: 2,
 			content: "Remarques prioritaires à lire avant toute action.",
@@ -25,7 +31,7 @@ function defaultPimPages() {
 		{
 			title: "Suivi des formations",
 			slug: "suivi-formations",
-			type: "formations",
+			type: PAGE_TYPES.FORMATIONS,
 			isRequired: true,
 			position: 3,
 			content:
@@ -34,7 +40,7 @@ function defaultPimPages() {
 		{
 			title: "Guide opérationnel",
 			slug: "guide-operationnel",
-			type: "prelude",
+			type: PAGE_TYPES.PRELUDE,
 			isRequired: true,
 			position: 4,
 			content:
@@ -44,8 +50,8 @@ function defaultPimPages() {
 }
 
 /**
- * Builds Default Trainings
- * @returns {Array<{ title: string, description: string, category: string, isRequired: boolean }>} Trainings List
+ * Builds the default trainings list
+ * @returns {Array<{ title: string, description: string, category: string, isRequired: boolean }>} Trainings list
  */
 
 function defaultTrainings() {
@@ -54,67 +60,59 @@ function defaultTrainings() {
 			title: "Règles et procédures de modération",
 			description:
 				"Protocoles de modération, seuils, escalade et documentation.",
-			category: "obligatoire",
+			category: TRAINING_CATEGORY.OBLIGATOIRE,
 			isRequired: true,
 		},
 		{
 			title: "Culture Marsha Academy",
 			description: "Valeurs, posture, autonomie et esprit d'équipe.",
-			category: "obligatoire",
+			category: TRAINING_CATEGORY.OBLIGATOIRE,
 			isRequired: true,
 		},
 		{
 			title: "Soft skills et communication",
 			description:
 				"Communication non violente, feedback et conduite d'entretien.",
-			category: "obligatoire",
+			category: TRAINING_CATEGORY.OBLIGATOIRE,
 			isRequired: true,
 		},
 		{
 			title: "Atelier de perfectionnement Live multi-plateforme",
 			description:
 				"Gestion pratique d'un live YouTube/Twitch avec incidents.",
-			category: "perfectionnement",
+			category: TRAINING_CATEGORY.PERFECTIONNEMENT,
 			isRequired: false,
 		},
 	];
 }
 
 /**
- * Builds Default Event Templates
- * @returns {Array<{ title: string, eventType: string }>} Template List
+ * Builds the default feed event template list
+ * @returns {Array<{ title: string, eventType: string }>} Template list
  */
 
 function defaultFeedEventTemplates() {
 	return [
-		{ title: "Live de prévu", eventType: "live_multi" },
-		{ title: "Bilan RRJ", eventType: "entrevue_rrj" },
-		{ title: "Bilan RJ", eventType: "entrevue_rj" },
-		{ title: "Animation", eventType: "atelier" },
+		{ title: "Live de prévu", eventType: EVENT_TYPE.LIVE_MULTI },
+		{ title: "Bilan RRJ", eventType: EVENT_TYPE.ENTREVUE_RRJ },
+		{ title: "Bilan RJ", eventType: EVENT_TYPE.ENTREVUE_RJ },
+		{ title: "Animation", eventType: EVENT_TYPE.ATELIER },
 	];
 }
 
 /**
- * Builds Default Junior Data
- * @param {string} template Template Key
- * @returns {{ dispositif?: string, status?: string }} Junior Seed
+ * Returns seed data for a junior based on template key
+ * @param {string} template Template key
+ * @returns {{ dispositif?: string, status?: string }} Junior seed data
  */
 
 function juniorTemplate(template) {
 	if (template === "ATRIA") {
-		return {
-			// ATRIA template
-			dispositif: "ATRIA",
-			status: "non_debutee",
-		};
+		return { dispositif: "ATRIA", status: config.pim.juniorDefaultStatus };
 	}
 
-	// PULSE template
 	if (template === "PULSE") {
-		return {
-			dispositif: "PULSE",
-			status: "non_debutee",
-		};
+		return { dispositif: "PULSE", status: config.pim.juniorDefaultStatus };
 	}
 
 	return {};
