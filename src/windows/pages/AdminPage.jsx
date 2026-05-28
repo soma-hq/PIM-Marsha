@@ -152,7 +152,7 @@ export function AdminPage({ users, onUserCreated, user }) {
 					<p className="text-xs uppercase tracking-[0.22em] text-white/35">
 						Admin
 					</p>
-					<h2 className="mt-2 text-3xl font-semibold">
+					<h2 className="mt-2 text-2xl font-semibold sm:text-3xl">
 						Gestion des accès
 					</h2>
 				</div>
@@ -294,71 +294,80 @@ export function AdminPage({ users, onUserCreated, user }) {
 
 			{panel === "users" ? (
 				<div className="overflow-hidden rounded-md border border-white/10 bg-white/[0.03]">
-					<table className="min-w-full divide-y divide-white/10 text-left text-sm">
-						<thead className="bg-white/[0.04] text-white/70">
-							<tr>
-								<th className="px-4 py-3">Nom</th>
-								<th className="px-4 py-3">Email</th>
-								<th className="px-4 py-3">Rôle</th>
-								<th className="px-4 py-3">Statut</th>
-								<th className="px-4 py-3">Sécurité</th>
-								{isSuperAdmin ? (
-									<th className="px-4 py-3">Action</th>
-								) : null}
-							</tr>
-						</thead>
-						<tbody className="divide-y divide-white/10 bg-black/40">
-							{users.map((currentUser) => {
-								const isActive = currentUser.isActive !== false;
-								return (
-									<tr key={currentUser.id}>
-										<td className="px-4 py-3">
-											{currentUser.name}
-										</td>
-										<td className="px-4 py-3 text-white/70">
-											{currentUser.email}
-										</td>
-										<td className="px-4 py-3">
-											{String(
-												currentUser.role || "",
-											).toLowerCase()}
-										</td>
-										<td className="px-4 py-3">
-											<span
-												className={`rounded-md border px-2 py-1 text-xs font-semibold ${isActive ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-200" : "border-rose-400/30 bg-rose-500/10 text-rose-200"}`}>
-												{isActive ? "Actif" : "Inactif"}
-											</span>
-										</td>
-										<td className="px-4 py-3 text-xs text-white/70">
-											{currentUser.mustChangePassword
-												? "Doit changer son mot de passe"
-												: "Profil standard"}
-										</td>
-										{isSuperAdmin ? (
+					<div className="overflow-x-auto">
+						<table className="min-w-full divide-y divide-white/10 text-left text-sm">
+							<thead className="bg-white/[0.04] text-white/70">
+								<tr>
+									<th className="px-4 py-3">Nom</th>
+									<th className="hidden px-4 py-3 sm:table-cell">
+										Email
+									</th>
+									<th className="px-4 py-3">Rôle</th>
+									<th className="px-4 py-3">Statut</th>
+									<th className="hidden px-4 py-3 md:table-cell">
+										Sécurité
+									</th>
+									{isSuperAdmin ? (
+										<th className="px-4 py-3">Action</th>
+									) : null}
+								</tr>
+							</thead>
+							<tbody className="divide-y divide-white/10 bg-black/40">
+								{users.map((currentUser) => {
+									const isActive =
+										currentUser.isActive !== false;
+									return (
+										<tr key={currentUser.id}>
 											<td className="px-4 py-3">
-												<button
-													type="button"
-													disabled={
-														updatingUserId ===
-														currentUser.id
-													}
-													onClick={() =>
-														toggleActive(
-															currentUser,
-														)
-													}
-													className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-white/80 hover:bg-white/5 disabled:opacity-60">
-													{isActive
-														? "Désactiver"
-														: "Activer"}
-												</button>
+												{currentUser.name}
 											</td>
-										) : null}
-									</tr>
-								);
-							})}
-						</tbody>
-					</table>
+											<td className="hidden px-4 py-3 text-white/70 sm:table-cell">
+												{currentUser.email}
+											</td>
+											<td className="px-4 py-3">
+												{String(
+													currentUser.role || "",
+												).toLowerCase()}
+											</td>
+											<td className="px-4 py-3">
+												<span
+													className={`rounded-md border px-2 py-1 text-xs font-semibold ${isActive ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-200" : "border-rose-400/30 bg-rose-500/10 text-rose-200"}`}>
+													{isActive
+														? "Actif"
+														: "Inactif"}
+												</span>
+											</td>
+											<td className="hidden px-4 py-3 text-xs text-white/70 md:table-cell">
+												{currentUser.mustChangePassword
+													? "Doit changer son mot de passe"
+													: "Profil standard"}
+											</td>
+											{isSuperAdmin ? (
+												<td className="px-4 py-3">
+													<button
+														type="button"
+														disabled={
+															updatingUserId ===
+															currentUser.id
+														}
+														onClick={() =>
+															toggleActive(
+																currentUser,
+															)
+														}
+														className="rounded-md border border-white/20 px-3 py-1.5 text-xs text-white/80 hover:bg-white/5 disabled:opacity-60">
+														{isActive
+															? "Désactiver"
+															: "Activer"}
+													</button>
+												</td>
+											) : null}
+										</tr>
+									);
+								})}
+							</tbody>
+						</table>
+					</div>
 					{status ? (
 						<p className="p-4 text-sm text-white/70">{status}</p>
 					) : null}
