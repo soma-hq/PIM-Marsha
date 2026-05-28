@@ -339,7 +339,9 @@ function CreatePimModal({ organizations, initialOrgId, onCreated, onClose }) {
 									...(organizations || []).map((org) => ({
 										value: org.id,
 										label: org.name,
-										logoUrl: CUSTOMER_LOGO_BY_KEY[org.logoKey] || null,
+										logoUrl:
+											CUSTOMER_LOGO_BY_KEY[org.logoKey] ||
+											null,
 									})),
 								]}
 								onChange={(value) =>
@@ -432,7 +434,9 @@ function AddJuniorModal({ pimId, referents, orgLogoUrl, onCreated, onClose }) {
 								className="h-8 w-auto object-contain"
 							/>
 						) : null}
-						<h3 className="text-xl font-semibold">Ajouter un junior</h3>
+						<h3 className="text-xl font-semibold">
+							Ajouter un junior
+						</h3>
 					</div>
 					<button
 						type="button"
@@ -1437,7 +1441,9 @@ export function SessionsPage({
 	const initialFromUrl = parseSearchParams();
 	const [selectedPimId, setSelectedPimId] = useState(initialFromUrl.pim);
 	const [activePimTab, setActivePimTab] = useState(initialFromUrl.tab);
-	const [showCreatePim, setShowCreatePim] = useState(Boolean(initialCreateOrgId));
+	const [showCreatePim, setShowCreatePim] = useState(
+		Boolean(initialCreateOrgId),
+	);
 	const [localPims, setLocalPims] = useState(pims || []);
 	const [localEvents, setLocalEvents] = useState(events || []);
 	const [pimJuniors, setPimJuniors] = useState([]);
@@ -1527,10 +1533,13 @@ export function SessionsPage({
 										src={selectedOrgLogoUrl}
 										alt=""
 										className="h-10 w-auto object-contain"
-										style={{ transform: `scale(${selectedOrgLogoScale})`, transformOrigin: "left center" }}
+										style={{
+											transform: `scale(${selectedOrgLogoScale})`,
+											transformOrigin: "left center",
+										}}
 									/>
 								) : null}
-								<h2 className="text-3xl font-semibold">
+								<h2 className="text-2xl font-semibold sm:text-3xl">
 									{selectedPim.title}
 								</h2>
 							</div>
@@ -1621,7 +1630,7 @@ export function SessionsPage({
 							<p className="text-xs uppercase tracking-[0.22em] text-white/35">
 								Sessions
 							</p>
-							<h2 className="mt-2 text-3xl font-semibold">
+							<h2 className="mt-2 text-2xl font-semibold sm:text-3xl">
 								PIM en cours
 							</h2>
 						</div>
@@ -1652,7 +1661,11 @@ export function SessionsPage({
 											{pim.code}
 										</p>
 										<p className="text-[10px] text-white/30">
-											{formatDateOrFallback(pim.startDate)} → {formatDateOrFallback(pim.endDate)}
+											{formatDateOrFallback(
+												pim.startDate,
+											)}{" "}
+											→{" "}
+											{formatDateOrFallback(pim.endDate)}
 										</p>
 									</div>
 									<span className="rounded-md border border-white/10 bg-black/35 px-2 py-1 text-[10px] uppercase tracking-[0.18em] text-white/60">
