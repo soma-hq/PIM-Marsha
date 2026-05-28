@@ -1,0 +1,358 @@
+:root {
+	color-scheme: dark;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	margin: 0;
+	padding: 0;
+}
+
+body {
+	font-family: "Manrope", sans-serif;
+	background:
+		radial-gradient(
+			circle at top left,
+			rgba(96, 165, 250, 0.08),
+			transparent 26%
+		),
+		radial-gradient(
+			circle at right center,
+			rgba(217, 70, 239, 0.08),
+			transparent 28%
+		),
+		#060606;
+}
+
+.nav-btn {
+	display: flex;
+	width: 100%;
+	align-items: center;
+	justify-content: space-between;
+	border-radius: 18px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: rgba(255, 255, 255, 0.03);
+	padding: 0.9rem 1rem;
+	color: rgba(255, 255, 255, 0.72);
+	font-size: 0.92rem;
+	font-weight: 600;
+	transition:
+		transform 0.2s ease,
+		background 0.2s ease,
+		border-color 0.2s ease,
+		color 0.2s ease;
+}
+
+.nav-btn:hover,
+.nav-btn.is-active {
+	transform: translateX(3px);
+	background: linear-gradient(
+		135deg,
+		rgba(250, 204, 21, 0.16),
+		rgba(255, 255, 255, 0.06)
+	);
+	border-color: rgba(250, 204, 21, 0.32);
+	color: #fff;
+}
+
+.surface-card {
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 28px;
+	padding: 1.35rem;
+	background: linear-gradient(
+		180deg,
+		rgba(255, 255, 255, 0.05),
+		rgba(255, 255, 255, 0.025)
+	);
+	box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22);
+}
+
+.stat-card {
+	display: flex;
+	min-height: 145px;
+	flex-direction: column;
+	justify-content: space-between;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 28px;
+	padding: 1.25rem;
+	background: linear-gradient(
+		160deg,
+		rgba(255, 255, 255, 0.06),
+		rgba(255, 255, 255, 0.025)
+	);
+}
+
+.stat-card span,
+.eyebrow {
+	font-size: 0.72rem;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.28em;
+	color: rgba(255, 255, 255, 0.35);
+}
+
+.stat-card strong {
+	font-family: "Space Grotesk", sans-serif;
+	font-size: clamp(2rem, 3vw, 3.4rem);
+	line-height: 1;
+}
+
+.stat-card small {
+	color: rgba(255, 255, 255, 0.5);
+}
+
+.section-title {
+	margin-top: 0.25rem;
+	font-family: "Space Grotesk", sans-serif;
+	font-size: 1.8rem;
+	font-weight: 700;
+	line-height: 1.1;
+}
+
+.card-list {
+	display: grid;
+	gap: 0.95rem;
+}
+
+.entity-card {
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 24px;
+	padding: 1rem;
+	background: rgba(255, 255, 255, 0.035);
+	transition:
+		transform 0.2s ease,
+		border-color 0.2s ease,
+		background 0.2s ease;
+}
+
+.entity-card:hover {
+	transform: translateY(-2px);
+	border-color: rgba(250, 204, 21, 0.24);
+	background: rgba(255, 255, 255, 0.055);
+}
+
+.entity-card.is-selected {
+	border-color: rgba(250, 204, 21, 0.4);
+	background: linear-gradient(
+		160deg,
+		rgba(250, 204, 21, 0.12),
+		rgba(255, 255, 255, 0.05)
+	);
+}
+
+.entity-head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.entity-title {
+	font-family: "Space Grotesk", sans-serif;
+	font-size: 1.05rem;
+	font-weight: 700;
+	color: #fff;
+}
+
+.entity-meta,
+.entity-text {
+	margin-top: 0.35rem;
+	font-size: 0.9rem;
+	line-height: 1.65;
+	color: rgba(255, 255, 255, 0.6);
+}
+
+.tag-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin-top: 0.8rem;
+}
+
+.tag {
+	display: inline-flex;
+	align-items: center;
+	border-radius: 999px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	padding: 0.35rem 0.65rem;
+	font-size: 0.72rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.72);
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.entity-actions,
+.form-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.65rem;
+	margin-top: 1rem;
+}
+
+.primary-btn,
+.ghost-btn,
+.mini-btn {
+	border: 0;
+	border-radius: 16px;
+	padding: 0.9rem 1rem;
+	font-size: 0.85rem;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition:
+		transform 0.18s ease,
+		background 0.18s ease,
+		color 0.18s ease,
+		border-color 0.18s ease;
+}
+
+.primary-btn:hover,
+.ghost-btn:hover,
+.mini-btn:hover {
+	transform: translateY(-1px);
+}
+
+.primary-btn {
+	background: #facc15;
+	color: #000;
+}
+
+.ghost-btn,
+.mini-btn {
+	border: 1px solid rgba(255, 255, 255, 0.09);
+	background: rgba(255, 255, 255, 0.05);
+	color: #fff;
+}
+
+.mini-btn {
+	padding: 0.7rem 0.85rem;
+	font-size: 0.72rem;
+}
+
+.mini-btn.danger {
+	border-color: rgba(248, 113, 113, 0.18);
+	color: #fda4af;
+}
+
+.form-grid {
+	display: grid;
+	gap: 1rem;
+}
+
+.form-grid label {
+	display: grid;
+	gap: 0.5rem;
+	color: rgba(255, 255, 255, 0.72);
+	font-size: 0.9rem;
+	font-weight: 600;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+	width: 100%;
+	border-radius: 18px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: rgba(255, 255, 255, 0.04);
+	padding: 0.95rem 1rem;
+	font: inherit;
+	color: #fff;
+	outline: none;
+	transition:
+		border-color 0.2s ease,
+		background 0.2s ease;
+}
+
+.form-grid textarea {
+	min-height: 140px;
+	resize: vertical;
+}
+
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus {
+	border-color: rgba(250, 204, 21, 0.5);
+	background: rgba(255, 255, 255, 0.07);
+}
+
+.empty-state {
+	border: 1px dashed rgba(255, 255, 255, 0.12);
+	border-radius: 24px;
+	padding: 1rem;
+	text-align: center;
+	color: rgba(255, 255, 255, 0.45);
+}
+
+#calendar {
+	min-height: 640px;
+}
+
+.fc {
+	--fc-border-color: rgba(255, 255, 255, 0.08);
+	--fc-page-bg-color: transparent;
+	--fc-neutral-bg-color: rgba(255, 255, 255, 0.03);
+	--fc-list-event-hover-bg-color: rgba(255, 255, 255, 0.05);
+	--fc-today-bg-color: rgba(250, 204, 21, 0.07);
+	--fc-event-bg-color: rgba(250, 204, 21, 0.85);
+	--fc-event-border-color: rgba(250, 204, 21, 0.85);
+	--fc-event-text-color: #000;
+	color: rgba(255, 255, 255, 0.82);
+}
+
+.fc .fc-toolbar-title {
+	font-family: "Space Grotesk", sans-serif;
+	font-size: 1.4rem;
+	font-weight: 700;
+}
+
+.fc .fc-button {
+	border-radius: 14px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: rgba(255, 255, 255, 0.05);
+	box-shadow: none;
+	text-transform: capitalize;
+}
+
+.fc .fc-button-primary:not(:disabled).fc-button-active,
+.fc .fc-button-primary:not(:disabled):active,
+.fc .fc-button:hover {
+	background: rgba(250, 204, 21, 0.9);
+	color: #000;
+	border-color: rgba(250, 204, 21, 0.9);
+}
+
+@media (max-width: 1279px) {
+	#calendar {
+		min-height: 480px;
+	}
+}
+
+@media (max-width: 767px) {
+	.surface-card,
+	.stat-card {
+		border-radius: 24px;
+	}
+
+	#calendar {
+		min-height: 420px;
+	}
+
+	.fc .fc-toolbar {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.85rem;
+	}
+
+	.fc .fc-toolbar-chunk {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+}

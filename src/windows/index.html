@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>PIM Marsha</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+			rel="stylesheet" />
+		<link
+			href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.17/index.global.min.css"
+			rel="stylesheet" />
+		<script>
+			tailwind = window.tailwind || {};
+			tailwind.config = {
+				theme: {
+					extend: {
+						colors: {
+							obsidian: "#060606",
+							panel: "#111111",
+							line: "#232323",
+							muted: "#9f9f9f",
+							accent: "#facc15",
+							accentSoft: "#fde68a",
+							blueflash: "#60a5fa",
+						},
+						fontFamily: {
+							display: ["Space Grotesk", "sans-serif"],
+							body: ["Manrope", "sans-serif"],
+						},
+						boxShadow: {
+							panel: "0 30px 80px rgba(0, 0, 0, 0.45)",
+						},
+					},
+				},
+			};
+		</script>
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link href="/styles.css" rel="stylesheet" />
+	</head>
+	<body class="min-h-screen bg-obsidian text-white font-body antialiased">
+		<div id="app" class="relative min-h-screen"></div>
+		<script src="/bundle.js"></script>
+	</body>
+</html>
