@@ -1,0 +1,10 @@
+{
+	"watch": ["src"],
+	"ext": "js,mjs,cjs,json",
+	"ignore": [
+		"src/windows/dist/**",
+		"src/windows/**/*.jsx",
+		"src/windows/**/*.css",
+		"src/windows/**/*.html"
+	]
+}

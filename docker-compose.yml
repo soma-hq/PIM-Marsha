@@ -1,0 +1,53 @@
+services:
+    app:
+        build: .
+        container_name: pim-marsha-app
+        environment:
+            NODE_ENV: development
+            PORT: 3000
+            JWT_SECRET: change-me-in-production
+            CORS_ORIGIN: "*"
+            COOKIE_NAME: pim_session
+            COOKIE_SAMESITE: lax
+            COOKIE_SECURE: "false"
+            DB_ENABLED: "true"
+            DB_HOST: postgres
+            DB_PORT: 5432
+            DB_NAME: pim_marsha
+            DB_USER: postgres
+            DB_PASSWORD: postgres
+            DB_SYNC: "true"
+            REDIS_ENABLED: "true"
+            REDIS_HOST: redis
+            REDIS_PORT: 6379
+            REDIS_DB: 0
+            REDIS_PREFIX: "pim:"
+        ports:
+            - "3000:3000"
+        depends_on:
+            - postgres
+            - redis
+
+    postgres:
+        image: postgres:16-alpine
+        container_name: pim-marsha-postgres
+        environment:
+            POSTGRES_DB: pim_marsha
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+        ports:
+            - "5432:5432"
+        volumes:
+            - pg_data:/var/lib/postgresql/data
+
+    redis:
+        image: redis:7-alpine
+        container_name: pim-marsha-redis
+        ports:
+            - "6379:6379"
+        volumes:
+            - redis_data:/data
+
+volumes:
+    pg_data:
+    redis_data:
