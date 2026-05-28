@@ -1,0 +1,294 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  RESPONSABLE
+  REFERENT
+  MEMBRE
+}
+
+enum JuniorStatus {
+  NON_DEBUTEE
+  STAND_BY
+  EN_COURS
+  ANNULEE
+  ACHEVEE
+}
+
+enum Dispositif {
+  PULSE
+  ATRIA
+}
+
+enum PimPageType {
+  NOTES_GENERALES
+  REMARQUES
+  FORMATIONS
+  GUIDE_OPERATIONNEL
+  CUSTOM
+}
+
+enum FeedEventType {
+  VOCAL
+  VOCAL_BILAN
+  ENTREVUE_RJ
+  ENTREVUE_RRJ
+  LIVE_YOUTUBE
+  LIVE_TWITCH
+  LIVE_MULTI
+  FORMATION
+  ATELIER
+  AUTRE
+}
+
+enum TrainingCategory {
+  OBLIGATOIRE
+  PERFECTIONNEMENT
+}
+
+enum RemarkPriority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Organization {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique
+  logoKey   String   @map("logo_key")
+  users     User[]
+  pims      Pim[]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("organizations")
+}
+
+model User {
+  id            String   @id @default(uuid()) @db.Uuid
+  email         String   @unique
+  name          String
+  firstName     String   @map("first_name")
+  lastName      String   @map("last_name")
+  avatarUrl     String?  @map("avatar_url")
+  organizationId String?  @db.Uuid @map("organization_id")
+  passwordHash  String   @map("password_hash")
+  role          UserRole
+  organization  Organization? @relation(fields: [organizationId], references: [id])
+  referedJuniors Junior[] @relation("JuniorReferent")
+  managedEvents  FeedEvent[] @relation("EventResponsable")
+  writtenNotes   Note[] @relation("NoteAuthor")
+  writtenRemarks Remark[] @relation("RemarkAuthor")
+  managedWorkshops Workshop[] @relation("WorkshopResponsable")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+model Pim {
+  id                String   @id @default(uuid()) @db.Uuid
+  organizationId    String?  @db.Uuid @map("organization_id")
+  title             String
+  code              String   @unique
+  confidentialityText String @map("confidentiality_text")
+  startDate         DateTime? @map("start_date") @db.Date
+  endDate           DateTime? @map("end_date") @db.Date
+  isPrivate         Boolean  @default(true) @map("is_private")
+  organization      Organization? @relation(fields: [organizationId], references: [id])
+  pages             Page[]
+  juniors           Junior[]
+  feedEvents        FeedEvent[]
+  notes             Note[]
+  remarks           Remark[]
+  trainings         Training[]
+  workshops         Workshop[]
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  @@map("pims")
+}
+
+model Page {
+  id         String   @id @default(uuid()) @db.Uuid
+  pimId      String   @db.Uuid @map("pim_id")
+  title      String
+  slug       String
+  type       PimPageType
+  content    String?
+  isRequired Boolean  @default(false) @map("is_required")
+  position   Int      @default(0)
+  pim        Pim      @relation(fields: [pimId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([pimId, slug])
+  @@map("pages")
+}
+
+model Junior {
+  id           String       @id @default(uuid()) @db.Uuid
+  pimId        String       @db.Uuid @map("pim_id")
+  firstName    String       @map("first_name")
+  lastName     String       @map("last_name")
+  displayName  String       @map("display_name")
+  status       JuniorStatus @default(NON_DEBUTEE)
+  referentId   String?      @db.Uuid @map("referent_id")
+  dispositif   Dispositif
+  startDate    DateTime?    @map("start_date") @db.Date
+  pim          Pim          @relation(fields: [pimId], references: [id], onDelete: Cascade)
+  referent     User?        @relation("JuniorReferent", fields: [referentId], references: [id])
+  feedEvents   JuniorFeedEvent[]
+  notes        JuniorNote[]
+  remarks      JuniorRemark[]
+  trainings    JuniorTraining[]
+  workshops    JuniorWorkshop[]
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("juniors")
+}
+
+model FeedEvent {
+  id            String       @id @default(uuid()) @db.Uuid
+  pimId         String       @db.Uuid @map("pim_id")
+  title         String
+  eventType     FeedEventType @default(AUTRE) @map("event_type")
+  description   String?
+  startAt       DateTime     @map("start_at")
+  endAt         DateTime?    @map("end_at")
+  responsableId String?      @db.Uuid @map("responsable_id")
+  pim           Pim          @relation(fields: [pimId], references: [id], onDelete: Cascade)
+  responsable   User?        @relation("EventResponsable", fields: [responsableId], references: [id])
+  juniors       JuniorFeedEvent[]
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@unique([pimId, title])
+  @@map("feed_events")
+}
+
+model Note {
+  id         String   @id @default(uuid()) @db.Uuid
+  pimId      String   @db.Uuid @map("pim_id")
+  title      String
+  content    String
+  scope      String   @default("general")
+  authorId   String?  @db.Uuid @map("author_id")
+  pim        Pim      @relation(fields: [pimId], references: [id], onDelete: Cascade)
+  author     User?    @relation("NoteAuthor", fields: [authorId], references: [id])
+  juniors    JuniorNote[]
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("notes")
+}
+
+model Remark {
+  id         String        @id @default(uuid()) @db.Uuid
+  pimId      String        @db.Uuid @map("pim_id")
+  title      String
+  content    String
+  scope      String        @default("general")
+  priority   RemarkPriority @default(MEDIUM)
+  authorId   String?       @db.Uuid @map("author_id")
+  pim        Pim           @relation(fields: [pimId], references: [id], onDelete: Cascade)
+  author     User?         @relation("RemarkAuthor", fields: [authorId], references: [id])
+  juniors    JuniorRemark[]
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("remarks")
+}
+
+model Training {
+  id         String           @id @default(uuid()) @db.Uuid
+  pimId      String           @db.Uuid @map("pim_id")
+  title      String
+  description String?
+  category   TrainingCategory @default(OBLIGATOIRE)
+  isRequired Boolean          @default(true) @map("is_required")
+  pim        Pim              @relation(fields: [pimId], references: [id], onDelete: Cascade)
+  juniors    JuniorTraining[]
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([pimId, title])
+  @@map("trainings")
+}
+
+model Workshop {
+  id            String   @id @default(uuid()) @db.Uuid
+  pimId         String   @db.Uuid @map("pim_id")
+  title         String
+  description   String?
+  completedAt   DateTime? @map("completed_at")
+  responsableId String?  @db.Uuid @map("responsable_id")
+  pim           Pim      @relation(fields: [pimId], references: [id], onDelete: Cascade)
+  responsable   User?    @relation("WorkshopResponsable", fields: [responsableId], references: [id])
+  juniors       JuniorWorkshop[]
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("workshops")
+}
+
+model JuniorFeedEvent {
+  juniorId    String   @db.Uuid @map("junior_id")
+  feedEventId String   @db.Uuid @map("feed_event_id")
+  junior      Junior   @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  feedEvent   FeedEvent @relation(fields: [feedEventId], references: [id], onDelete: Cascade)
+
+  @@id([juniorId, feedEventId])
+  @@map("junior_feed_events")
+}
+
+model JuniorNote {
+  juniorId String @db.Uuid @map("junior_id")
+  noteId   String @db.Uuid @map("note_id")
+  junior   Junior @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  note     Note   @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@id([juniorId, noteId])
+  @@map("junior_notes")
+}
+
+model JuniorRemark {
+  juniorId String @db.Uuid @map("junior_id")
+  remarkId String @db.Uuid @map("remark_id")
+  junior   Junior @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  remark   Remark @relation(fields: [remarkId], references: [id], onDelete: Cascade)
+
+  @@id([juniorId, remarkId])
+  @@map("junior_remarks")
+}
+
+model JuniorTraining {
+  juniorId   String @db.Uuid @map("junior_id")
+  trainingId String @db.Uuid @map("training_id")
+  status     String @default("not_started")
+  completedAt DateTime? @map("completed_at")
+  junior     Junior   @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  training   Training @relation(fields: [trainingId], references: [id], onDelete: Cascade)
+
+  @@id([juniorId, trainingId])
+  @@map("junior_trainings")
+}
+
+model JuniorWorkshop {
+  juniorId   String @db.Uuid @map("junior_id")
+  workshopId String @db.Uuid @map("workshop_id")
+  junior     Junior   @relation(fields: [juniorId], references: [id], onDelete: Cascade)
+  workshop   Workshop @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+
+  @@id([juniorId, workshopId])
+  @@map("junior_workshops")
+}
