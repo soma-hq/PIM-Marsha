@@ -1,0 +1,25 @@
+{
+	"enabled": false,
+	"username": "dummy",
+	"password": null,
+	"db": "dummy",
+	"port": 5432,
+	"host": "localhost",
+	"dialect": "postgres",
+	"ttl": 300,
+	"pool": {
+		"max": 50,
+		"connectionTimeout": 1000000,
+		"maxIdle": 200000
+	},
+	"schema": {
+		"prefix": "dummy"
+	},
+	"snowflake": {
+		"timeShift": 1548975600000
+	},
+	"synchronize": {
+		"status": false,
+		"event": "data"
+	}
+}

@@ -1,0 +1,7 @@
+{
+	"organizations": [
+		{ "name": "Michou", "logoKey": "michou.png" },
+		{ "name": "Doigby", "logoKey": "doigby.png" },
+		{ "name": "Inoxtag", "logoKey": "inoxtag.png" }
+	]
+}
