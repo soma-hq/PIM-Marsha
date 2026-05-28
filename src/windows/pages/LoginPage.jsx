@@ -169,7 +169,7 @@ export function LoginPage({ onLoginSuccess }) {
 								{consoleLogs.map((log, index) => (
 									<div
 										key={`${log.ts}-${index}`}
-										className={`grid grid-cols-[86px_52px_1fr] items-start gap-2 ${
+										className={`grid grid-cols-[58px_34px_1fr] items-start gap-1.5 sm:grid-cols-[86px_52px_1fr] sm:gap-2 ${
 											log.level === "error"
 												? "text-rose-300"
 												: log.level === "ok"

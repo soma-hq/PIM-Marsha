@@ -56,7 +56,7 @@ function OrgDashboard({ org, pims, onBack, onCreateSession }) {
 						<BuildingOfficeIcon className="h-10 w-10 text-white/30" />
 					)}
 					<div>
-						<h2 className="text-3xl font-semibold text-white">
+						<h2 className="text-2xl font-semibold text-white sm:text-3xl">
 							{org.name}
 						</h2>
 						<p className="mt-0.5 text-sm text-white/45">
@@ -168,7 +168,7 @@ export function OrganizationsPage({
 					<p className="text-xs uppercase tracking-[0.22em] text-white/35">
 						Organisation
 					</p>
-					<h2 className="mt-2 text-3xl font-semibold">
+					<h2 className="mt-2 text-2xl font-semibold sm:text-3xl">
 						Cartographie des orga
 					</h2>
 					<p className="mt-2 max-w-2xl text-sm text-white/55">
@@ -194,7 +194,7 @@ export function OrganizationsPage({
 							<img
 								src={getBanner(org)}
 								alt={`Bannière ${org.name}`}
-								className="h-64 w-full object-cover object-left"
+								className="h-40 w-full object-cover object-left sm:h-64"
 							/>
 							<div className="space-y-3 p-4">
 								<div className="flex items-center gap-3">

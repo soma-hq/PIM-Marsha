@@ -96,7 +96,7 @@ export function HomePage({ pims, logs, activity, user }) {
 
 	return (
 		<section className="mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
-			<div className="flex items-center gap-3 px-4 py-3">
+			<div className="flex items-center gap-3 py-3">
 				<img
 					src={user?.avatarUrl || "/logos/michou-logo.png"}
 					alt={user?.name || "Avatar"}
@@ -114,7 +114,7 @@ export function HomePage({ pims, logs, activity, user }) {
 			</div>
 
 			<div className="space-y-3 rounded-md border border-white/10 bg-[#090909] p-5">
-				<h2 className="text-2xl font-semibold">Activités récentes</h2>
+				<h2 className="text-xl font-semibold sm:text-2xl">Activités récentes</h2>
 				{groupedActivities.map((group) => {
 					if (!group.items.length) return null;
 					const isExpanded = Boolean(expanded[group.key]);
@@ -202,7 +202,7 @@ export function HomePage({ pims, logs, activity, user }) {
 						<div
 							key={pim.id}
 							className="rounded-md border border-white/10 bg-black/35 px-4 py-3">
-							<div className="flex items-center justify-between gap-2">
+							<div className="flex flex-wrap items-start justify-between gap-2">
 								<p className="font-semibold text-white">
 									{pim.title}
 								</p>
