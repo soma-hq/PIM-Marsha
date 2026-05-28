@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>PIM Marsha</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;500;700&display=swap"
+			rel="stylesheet" />
+		<link
+			href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.17/index.global.min.css"
+			rel="stylesheet" />
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link href="/styles.css" rel="stylesheet" />
+	</head>
+	<body class="min-h-screen bg-slate-950 text-slate-100">
+		<div class="bg-shape bg-shape-1"></div>
+		<div class="bg-shape bg-shape-2"></div>
+
+		<header>
+			<img class="logo" src="/logos/michou.png" alt="Logo" />
+			<h1>PIM HUB ADMIN</h1>
+			<p>Période d'intégration de modération - Marsha Academy</p>
+		</header>
+
+		<main>
+			<section class="panel confidentiality">
+				<h2>Confidentialité</h2>
+				<p>
+					Cette session est privée. Aucun partage externe. Toute fuite
+					peut entraîner la révocation immédiate du rôle de Référent
+					ou Tuteur.
+				</p>
+			</section>
+
+			<section class="panel auth-panel">
+				<h2>Connexion</h2>
+				<form id="auth-form">
+					<input
+						id="email"
+						type="email"
+						placeholder="Email"
+						required />
+					<input
+						id="password"
+						type="password"
+						placeholder="Mot de passe"
+						required />
+					<button type="submit">Se connecter</button>
+					<button id="logout-btn" type="button" class="secondary">
+						Se déconnecter
+					</button>
+				</form>
+				<div class="inline-row">
+					<button
+						id="bootstrap-owner"
+						type="button"
+						class="secondary">
+						Créer le premier Super Admin
+					</button>
+					<button id="refresh-all" type="button">Rafraîchir</button>
+				</div>
+				<p id="auth-status"></p>
+			</section>
+
+			<section class="grid-2">
+				<article class="panel">
+					<h2>PIMs</h2>
+					<form id="pim-form">
+						<input
+							id="pim-title"
+							placeholder="Titre de la PIM"
+							required />
+						<input
+							id="pim-code"
+							placeholder="Code (ex: PIMY-01-12-2025)"
+							required />
+						<button type="submit">Ajouter PIM</button>
+						<button
+							id="seed-pim-btn"
+							type="button"
+							class="secondary">
+							Seeder la PIM sélectionnée
+						</button>
+					</form>
+					<p class="hint">Clique sur une PIM pour la sélectionner.</p>
+					<ul id="pims-list" class="list"></ul>
+				</article>
+
+				<article class="panel">
+					<h2>Juniors (CRUD)</h2>
+					<form id="junior-form">
+						<input
+							id="junior-firstname"
+							placeholder="Prénom"
+							required />
+						<input
+							id="junior-lastname"
+							placeholder="Nom"
+							required />
+						<select id="junior-template">
+							<option value="PULSE">Modèle PULSE</option>
+							<option value="ATRIA">Modèle ATRIA</option>
+						</select>
+						<button type="submit">Ajouter Junior</button>
+					</form>
+					<ul id="juniors-list" class="list"></ul>
+				</article>
+
+				<article class="panel">
+					<h2>Utilisateurs (Super Admin)</h2>
+					<form id="user-form">
+						<input id="user-email" placeholder="Email" required />
+						<input
+							id="user-name"
+							placeholder="Nom affiché"
+							required />
+						<input
+							id="user-firstname"
+							placeholder="Prénom"
+							required />
+						<input
+							id="user-lastname"
+							placeholder="Nom de famille"
+							required />
+						<input
+							id="user-password"
+							type="password"
+							placeholder="Mot de passe"
+							required />
+						<select id="user-role">
+							<option value="membre">Membre</option>
+							<option value="referent">Référent</option>
+							<option value="responsable">Responsable</option>
+							<option value="owner">Owner</option>
+							<option value="super_admin">Super Admin</option>
+						</select>
+						<button type="submit">Ajouter utilisateur</button>
+					</form>
+					<ul id="users-list" class="list"></ul>
+				</article>
+			</section>
+
+			<section class="grid-2">
+				<article class="panel">
+					<h2>Notes (CRUD)</h2>
+					<form id="note-form">
+						<input
+							id="note-title"
+							placeholder="Titre de la note"
+							required />
+						<input
+							id="note-content"
+							placeholder="Contenu de la note"
+							required />
+						<button type="submit">Ajouter Note</button>
+					</form>
+					<ul id="notes-list" class="list"></ul>
+				</article>
+				<article class="panel">
+					<h2>Remarques (CRUD)</h2>
+					<form id="remark-form">
+						<input
+							id="remark-title"
+							placeholder="Titre de la remarque"
+							required />
+						<select id="remark-priority">
+							<option value="medium">Priorité : moyenne</option>
+							<option value="low">Priorité : basse</option>
+							<option value="high">Priorité : haute</option>
+							<option value="critical">
+								Priorité : critique
+							</option>
+						</select>
+						<input
+							id="remark-content"
+							placeholder="Contenu de la remarque"
+							required />
+						<button type="submit">Ajouter Remarque</button>
+					</form>
+					<ul id="remarks-list" class="list"></ul>
+				</article>
+			</section>
+
+			<section class="panel">
+				<h2>Événements du feed (CRUD) + calendrier</h2>
+				<form id="event-form">
+					<input
+						id="event-title"
+						placeholder="Titre de l'événement"
+						required />
+					<select id="event-type">
+						<option value="vocal">Vocal</option>
+						<option value="vocal_bilan">Vocal de bilan</option>
+						<option value="entrevue_rj">Entrevue RJ</option>
+						<option value="entrevue_rrj">Entrevue RRJ</option>
+						<option value="live_youtube">Live YouTube</option>
+						<option value="live_twitch">Live Twitch</option>
+						<option value="live_multi">
+							Live multi-plateforme
+						</option>
+						<option value="formation">Formation</option>
+						<option value="atelier">Atelier</option>
+						<option value="autre">Autre</option>
+					</select>
+					<input id="event-start" type="datetime-local" required />
+					<input id="event-end" type="datetime-local" />
+					<button type="submit">Ajouter l'événement</button>
+				</form>
+				<ul id="events-list" class="list"></ul>
+				<div id="calendar"></div>
+			</section>
+		</main>
+
+		<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.17/index.global.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.17/index.global.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.17/index.global.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.17/index.global.min.js"></script>
+		<script src="/app.js"></script>
+	</body>
+</html>
