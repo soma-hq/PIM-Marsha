@@ -36,15 +36,18 @@ module.exports = class RedisManager extends EventEmitter {
 			db: this.config.db,
 			password: this.config.password,
 			reconnectOnError: (err) =>
-				!(
-					err.message.includes("NOAUTH") ||
-					err.message.includes("ERR")
+				!["NOAUTH", "ERR"].some((prefix) =>
+					err.message.includes(prefix),
 				),
 			enableReadyCheck: true,
 			lazyConnect: true,
-			retryStrategy: (times) => Math.min(times * 50, 2000),
-			maxRetriesPerRequest: 3,
-			commandTimeout: 5000,
+			retryStrategy: (times) =>
+				Math.min(
+					times * this.config.retryBaseMs,
+					this.config.retryCapMs,
+				),
+			maxRetriesPerRequest: this.config.maxRetriesPerRequest,
+			commandTimeout: this.config.commandTimeoutMs,
 		};
 
 		return this._connectionOptions;
@@ -60,7 +63,7 @@ module.exports = class RedisManager extends EventEmitter {
 		return new Promise((resolve, reject) => {
 			const timeout = setTimeout(() => {
 				reject(new Error(`Redis ${purpose} client connection timeout`));
-			}, 10000);
+			}, this.config.connectionTimeoutMs);
 
 			const onEvent = (err) => {
 				clearTimeout(timeout);
@@ -107,7 +110,7 @@ module.exports = class RedisManager extends EventEmitter {
 						),
 					);
 			}
-		}, 30000);
+		}, this.config.heartbeatIntervalMs);
 
 		client.once("end", () => clearInterval(interval));
 	}
@@ -179,7 +182,7 @@ module.exports = class RedisManager extends EventEmitter {
 				"Redis cache not initialized, call connect() first",
 			);
 
-		const count = options.count || 1000;
+		const count = options.count || this.config.scanCount;
 		const limit = options.limit || 0;
 
 		const stream = this.cache.scanStream({ match, count });

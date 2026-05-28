@@ -1,0 +1,11 @@
+{
+	"payloadLimit": "2mb",
+	"sessionsLimit": 12,
+	"auditLogsLimit": 100,
+	"defaultUserPassword": "ChangeMe123!",
+	"defaultUserRole": "membre",
+	"activityRecentJuniorsLimit": 10,
+	"activityRecentEventsLimit": 10,
+	"activityRecentPimsLimit": 5,
+	"activityTotalLimit": 20
+}

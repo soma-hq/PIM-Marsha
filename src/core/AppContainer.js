@@ -5,7 +5,7 @@ const RedisManager = require("../managers/RedisManager");
 
 module.exports = class AppContainer {
 	constructor() {
-		// shared singletons
+		// Shared singletons
 		this.config = config;
 		this.logger = logger;
 		this.redis = new RedisManager(this);
@@ -13,7 +13,7 @@ module.exports = class AppContainer {
 	}
 
 	async init() {
-		// infra boot
+		// Infra boot
 		await this.redis.connect();
 		await this.database.load();
 	}

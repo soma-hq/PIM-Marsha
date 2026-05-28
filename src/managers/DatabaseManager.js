@@ -2,6 +2,7 @@ const fs = require("fs/promises");
 const path = require("path");
 const { Sequelize } = require("sequelize");
 const { runSchemaUpgrades } = require("../services/schemaUpgradeService");
+const { DB, PATHS } = require("../utils/constants");
 
 module.exports = class DatabaseManager {
 	constructor(app) {
@@ -49,13 +50,12 @@ module.exports = class DatabaseManager {
 	async load() {
 		await this.connector.authenticate();
 
-		const modelsPath = path.join(__dirname, "../entities");
+		const modelsPath = path.join(__dirname, PATHS.ENTITIES);
 		const modelFiles = await fs.readdir(modelsPath);
 
 		for (const file of modelFiles) {
 			if (!file.endsWith(".js")) continue;
-			if (file === "index.js") continue;
-			if (file === "BaseEntity.js") continue;
+			if (DB.EXCLUDE_FILES.includes(file)) continue;
 
 			try {
 				const EntityClass = require(path.join(modelsPath, file));

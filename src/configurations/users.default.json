@@ -1,0 +1,67 @@
+{
+	"users": [
+		{
+			"email": "jeremy@mtdwn.com",
+			"name": "Jérémy",
+			"firstName": "Jérémy",
+			"lastName": "Jérémy",
+			"role": "super_admin",
+			"organizationName": null,
+			"password": "ChangeMe123!"
+		},
+		{
+			"email": "zarokam.prod@gmail.com",
+			"name": "Andy",
+			"firstName": "Andy",
+			"lastName": "Andy",
+			"role": "responsable",
+			"organizationName": "Michou",
+			"password": "ChangeMe123!"
+		},
+		{
+			"email": "procyonaaa@gmail.com",
+			"name": "Procy",
+			"firstName": "Procy",
+			"lastName": "Procy",
+			"role": "responsable",
+			"organizationName": "Michou",
+			"password": "ChangeMe123!"
+		},
+		{
+			"email": "antoine@shaptwn.com",
+			"name": "Antoine",
+			"firstName": "Antoine",
+			"lastName": "Antoine",
+			"role": "responsable",
+			"organizationName": "Michou",
+			"password": "ChangeMe123!"
+		},
+		{
+			"email": "anaelle.referent@mtdwn.com",
+			"name": "Anaëlle",
+			"firstName": "Anaëlle",
+			"lastName": "Anaëlle",
+			"role": "referent",
+			"organizationName": "Michou",
+			"password": "ChangeMe123!"
+		},
+		{
+			"email": "reouven.referent@mtdwn.com",
+			"name": "Réouven",
+			"firstName": "Réouven",
+			"lastName": "Réouven",
+			"role": "referent",
+			"organizationName": "Michou",
+			"password": "ChangeMe123!"
+		},
+		{
+			"email": "mia.referent@mtdwn.com",
+			"name": "Mia",
+			"firstName": "Mia",
+			"lastName": "Mia",
+			"role": "referent",
+			"organizationName": "Michou",
+			"password": "ChangeMe123!"
+		}
+	]
+}

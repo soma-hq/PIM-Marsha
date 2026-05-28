@@ -1,0 +1,6 @@
+{
+	"templateEventDescription": "Template evenement PIM",
+	"templateEventBaseDate": "2025-12-01T09:00:00.000Z",
+	"juniorDefaultStatus": "non_debutee",
+	"templateEventDurationMs": 3600000
+}

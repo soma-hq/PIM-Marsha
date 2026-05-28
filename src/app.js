@@ -9,16 +9,15 @@ const {
 	applySecurityHeaders,
 	buildCorsOriginResolver,
 } = require("./services/httpSecurityService");
+const { ROUTES, PATHS } = require("./utils/constants");
 
 module.exports = function buildApp(container) {
 	const app = express();
 	app.disable("x-powered-by");
 
-	// CORS allow list
 	const allowedOrigins = parseAllowedOrigins(container.config.corsOrigin);
 
-	app.use((req, res, next) => {
-		// Security headers
+	app.use((_req, res, next) => {
 		applySecurityHeaders(res);
 		next();
 	});
@@ -29,21 +28,23 @@ module.exports = function buildApp(container) {
 			credentials: true,
 		}),
 	);
-	// Payload cap
-	app.use(express.json({ limit: "2mb" }));
+	app.use(express.json({ limit: container.config.api.payloadLimit }));
 	app.use(cookieParser());
 
-	app.use("/api", buildApi(container));
+	app.use(ROUTES.API, buildApi(container));
 	app.use(
-		"/assets",
-		express.static(path.join(process.cwd(), "public/assets")),
+		ROUTES.ASSETS,
+		express.static(path.join(process.cwd(), PATHS.PUBLIC_ASSETS)),
 	);
-	app.use("/logos", express.static(path.join(process.cwd(), "public/logos")));
 	app.use(
-		"/bundle.js",
-		express.static(path.join(process.cwd(), "src/windows/dist/bundle.js")),
+		ROUTES.LOGOS,
+		express.static(path.join(process.cwd(), PATHS.PUBLIC_LOGOS)),
 	);
-	app.use(express.static(path.join(process.cwd(), "src/windows")));
+	app.use(
+		ROUTES.BUNDLE,
+		express.static(path.join(process.cwd(), PATHS.WINDOWS_BUNDLE)),
+	);
+	app.use(express.static(path.join(process.cwd(), PATHS.WINDOWS_ROOT)));
 
 	return app;
 };
