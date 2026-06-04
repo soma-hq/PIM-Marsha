@@ -31,3 +31,6 @@ tmp/
 
 # Script
 scripts/
+
+# Tests
+seed.test.js
