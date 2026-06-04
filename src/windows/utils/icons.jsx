@@ -7,6 +7,7 @@ export {
 	XMarkIcon,
 	ChevronDownIcon,
 	ChevronUpIcon,
+	ChevronLeftIcon,
 	ChevronRightIcon,
 	UserCircleIcon,
 	UsersIcon,

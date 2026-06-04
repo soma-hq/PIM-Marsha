@@ -74,7 +74,10 @@ export function App() {
 	const [error, setError] = useState("");
 	const [pageLoading, setPageLoading] = useState(false);
 	const [reloadTick, setReloadTick] = useState(0);
-	const [prefs, setPrefs] = useState({ toastDurationMs: 4000, logoScales: {} });
+	const [prefs, setPrefs] = useState({
+		toastDurationMs: 4000,
+		logoScales: {},
+	});
 
 	const isAuthenticated = Boolean(user);
 
@@ -129,8 +132,16 @@ export function App() {
 
 				try {
 					const prefsRes = await fetchPrefs();
-					if (mounted) setPrefs(prefsRes.prefs || { toastDurationMs: 4000, logoScales: {} });
-				} catch { /* ignore prefs errors */ }
+					if (mounted)
+						setPrefs(
+							prefsRes.prefs || {
+								toastDurationMs: 4000,
+								logoScales: {},
+							},
+						);
+				} catch {
+					/* ignore prefs errors */
+				}
 
 				if (["super_admin", "responsable"].includes(role)) {
 					const [orgRes, usersRes] = await Promise.all([
@@ -368,49 +379,47 @@ export function App() {
 
 	return (
 		<ToastProvider durationMs={prefs.toastDurationMs}>
-		<div className="min-h-screen bg-black text-white">
-			<HeaderBar
-				user={user}
-				activeTab={activeTab}
-				onTabChange={setActiveTab}
-				onOpenProfile={() => {
-					setActiveTab("settings");
-					setMenuOpen(false);
-				}}
-				onLogout={onLogout}
-				menuOpen={menuOpen}
-				onToggleMenu={() => setMenuOpen((prev) => !prev)}
-			/>
-			{pageLoading ? (
-				<div className="fixed inset-0 z-40 flex items-center justify-center bg-black/45 backdrop-blur-[1px]">
-					<div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/80 px-5 py-3 text-sm text-white/80">
-						<img
-							src="/logos/loader.gif"
-							alt="Chargement"
-							className="h-6 w-6 rounded-full"
-						/>
-						Chargement des pages...
+			<div className="min-h-screen bg-black text-[14px] text-white sm:text-[15px]">
+				<HeaderBar
+					user={user}
+					activeTab={activeTab}
+					onTabChange={(nextTab) => {
+						if (nextTab === activeTab) return;
+						setActiveTab(nextTab);
+					}}
+					onOpenProfile={() => {
+						setActiveTab("settings");
+						setMenuOpen(false);
+					}}
+					onLogout={onLogout}
+					menuOpen={menuOpen}
+					onToggleMenu={() => setMenuOpen((prev) => !prev)}
+				/>
+				{pageLoading ? (
+					<div className="fixed top-0 inset-x-0 z-50 h-[2px] bg-white/15">
+						<div className="h-full w-1/3 animate-pulse rounded-full bg-white/50" />
 					</div>
+				) : null}
+				<div>
+					{error ? (
+						<ErrorPage
+							message={error}
+							onRetry={() => {
+								setReloadTick((prev) => prev + 1);
+							}}
+						/>
+					) : (
+						pageNode
+					)}
 				</div>
-			) : null}
-			{error ? (
-				<ErrorPage
-					message={error}
-					onRetry={() => {
-						setReloadTick((prev) => prev + 1);
-					}}
-				/>
-			) : (
-				pageNode
-			)}
-			{user?.mustChangePassword ? (
-				<ForcePasswordModal
-					onCompleted={(updatedUser) => {
-						setUser(updatedUser);
-					}}
-				/>
-			) : null}
-		</div>
+				{user?.mustChangePassword ? (
+					<ForcePasswordModal
+						onCompleted={(updatedUser) => {
+							setUser(updatedUser);
+						}}
+					/>
+				) : null}
+			</div>
 		</ToastProvider>
 	);
 }

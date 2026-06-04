@@ -27,6 +27,7 @@ export function HeaderBar({
 	const tabs = buildHeaderTabs(user);
 	const [navOpen, setNavOpen] = useState(false);
 
+	const hasAvatar = Boolean(user?.avatarUrl);
 	return (
 		<header className="sticky top-0 z-40 border-b border-white/10 bg-black/90 backdrop-blur-xl">
 			<div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -71,11 +72,18 @@ export function HeaderBar({
 						<img
 							src={user?.avatarUrl || "/logos/michou-logo.png"}
 							alt={user?.name || "Avatar"}
-							className="h-8 w-8 rounded-full object-cover"
+							className={`h-8 w-8 rounded-full ${
+								hasAvatar
+									? "object-cover"
+									: "bg-white/[0.05] p-1 object-contain"
+							}`}
 							onError={(event) => {
 								if (!event.currentTarget.dataset.fallback) {
 									event.currentTarget.dataset.fallback = "1";
-									event.currentTarget.src = "/logos/michou-logo.png";
+									event.currentTarget.src =
+										"/logos/michou-logo.png";
+									event.currentTarget.className =
+										"h-8 w-8 rounded-full bg-white/[0.05] p-1 object-contain";
 								}
 							}}
 						/>

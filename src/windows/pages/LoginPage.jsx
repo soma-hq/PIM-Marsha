@@ -77,9 +77,9 @@ export function LoginPage({ onLoginSuccess }) {
 	return (
 		<div className="relative min-h-screen bg-black text-white">
 			<div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.07),_transparent_45%)]" />
-			<div className="relative grid min-h-screen w-full lg:grid-cols-[0.95fr_1fr]">
-				<section className="relative hidden items-center justify-start p-4 lg:flex">
-					<div className="relative h-full w-full overflow-hidden rounded-lg">
+			<div className="relative grid min-h-screen w-full lg:grid-cols-[0.7fr_1fr]">
+				<section className="relative hidden items-center justify-center p-4 lg:flex">
+					<div className="relative h-[92%] w-full max-w-2xl overflow-hidden rounded-lg">
 						<img
 							src="/assets/banners/inoxtag-banner.png"
 							alt="Banniere Inoxtag"
@@ -89,25 +89,25 @@ export function LoginPage({ onLoginSuccess }) {
 					</div>
 				</section>
 
-				<section className="flex items-center justify-center p-4 sm:p-8 lg:p-10">
-					<div className="w-full max-w-2xl p-6 sm:p-10">
+				<section className="flex items-center justify-center p-4 sm:p-7 lg:p-9">
+					<div className="w-full max-w-xl p-5 sm:p-8">
 						<div className="mb-4 overflow-hidden rounded-md border border-white/10 lg:hidden">
 							<img
 								src="/assets/banners/inoxtag-banner.png"
 								alt="Banniere Inoxtag"
-								className="h-28 w-full object-cover object-left"
+								className="h-24 w-full object-cover object-left"
 							/>
 						</div>
 						<div className="mb-6 flex justify-center">
 							<img
 								src="/logos/marsha-logo.png"
 								alt="Marsha"
-								className="h-16 w-auto"
+								className="h-12 w-auto"
 							/>
 						</div>
-						<h2 className="text-3xl font-bold">Se connecter</h2>
+						<h2 className="text-2xl font-bold">Se connecter</h2>
 
-						<form className="mt-8 space-y-4" onSubmit={onSubmit}>
+						<form className="mt-6 space-y-3.5" onSubmit={onSubmit}>
 							<label className="block space-y-2 text-sm">
 								<span className="text-white/70">Email</span>
 								<input
@@ -117,7 +117,7 @@ export function LoginPage({ onLoginSuccess }) {
 									onChange={(event) =>
 										setEmail(event.target.value)
 									}
-									className="h-12 w-full rounded-md border border-white/10 bg-black/60 px-4 text-white outline-none focus:border-white/40"
+									className="h-11 w-full rounded-md border border-white/10 bg-black/60 px-4 text-sm text-white outline-none focus:border-white/40"
 									placeholder="email@domaine.com"
 								/>
 							</label>
@@ -133,7 +133,7 @@ export function LoginPage({ onLoginSuccess }) {
 									onChange={(event) =>
 										setPassword(event.target.value)
 									}
-									className="h-12 w-full rounded-md border border-white/10 bg-black/60 px-4 text-white outline-none focus:border-white/40"
+									className="h-11 w-full rounded-md border border-white/10 bg-black/60 px-4 text-sm text-white outline-none focus:border-white/40"
 									placeholder="********"
 								/>
 							</label>
@@ -141,7 +141,7 @@ export function LoginPage({ onLoginSuccess }) {
 							<button
 								type="submit"
 								disabled={submitting}
-								className="flex h-12 w-full items-center justify-center gap-2 rounded-md bg-white text-sm font-bold uppercase tracking-[0.2em] text-black transition hover:bg-white/90 disabled:opacity-60">
+								className="flex h-11 w-full items-center justify-center gap-2 rounded-md bg-white text-xs font-bold uppercase tracking-[0.2em] text-black transition hover:bg-white/90 disabled:opacity-60">
 								{submitting ? (
 									<>
 										<img
@@ -157,15 +157,15 @@ export function LoginPage({ onLoginSuccess }) {
 							</button>
 						</form>
 
-						<div className="mt-4 rounded-md border border-white/10 bg-black/50 px-4 py-3 text-sm text-white/75">
+						<div className="mt-3 rounded-md border border-white/10 bg-black/50 px-4 py-2.5 text-xs text-white/75 sm:text-sm">
 							{status}
 						</div>
 
-						<div className="mt-4 rounded-md border border-cyan-400/35 bg-[linear-gradient(160deg,#061224,#070d17)] p-4 shadow-[0_16px_40px_rgba(2,18,40,0.45)]">
+						<div className="mt-3 rounded-md border border-cyan-400/35 bg-[linear-gradient(160deg,#061224,#070d17)] p-3.5 shadow-[0_16px_40px_rgba(2,18,40,0.45)]">
 							<p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-cyan-300">
 								Console d'accès
 							</p>
-							<div className="max-h-40 space-y-1 overflow-auto font-mono text-xs">
+							<div className="max-h-36 space-y-1 overflow-auto font-mono text-[11px]">
 								{consoleLogs.map((log, index) => (
 									<div
 										key={`${log.ts}-${index}`}

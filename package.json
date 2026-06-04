@@ -5,9 +5,12 @@
 	"main": "src/server.js",
 	"type": "commonjs",
 	"packageManager": "yarn@1.22.22",
+	"engines": {
+		"node": ">=20 <23"
+	},
 	"scripts": {
 		"ensure:port3000": "node scripts/ensure-port-3000.js",
-		"dev": "yarn ensure:port3000 && concurrently \"yarn windows:watch\" \"nodemon src/server.js\"",
+		"dev": "node scripts/dev.js",
 		"start": "node src/server.js",
 		"windows:build": "esbuild src/windows/main.jsx --bundle --outfile=src/windows/dist/bundle.js --format=iife --platform=browser --target=es2020 --jsx=automatic",
 		"windows:watch": "esbuild src/windows/main.jsx --bundle --outfile=src/windows/dist/bundle.js --format=iife --platform=browser --target=es2020 --jsx=automatic --watch",
